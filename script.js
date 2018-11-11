@@ -4,9 +4,79 @@ function initMap() {
         lng: -6.280918
     };
 
+    var styles = [
+        {
+            featureType: 'poi.park',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#45C48B'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'poi',
+            elementType: 'labels.text.fill',
+            stylers: [
+                {color: '#323741'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'poi',
+            elementType: 'labels.text.stroke',
+            stylers: [
+                {visibility: 'off'}
+            ]
+        },{
+            featureType: 'road',
+            elementType: 'geometry.stroke',
+            stylers: [
+                {color: '#323741'},
+                {lightness: '50'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'transit',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#FFD039'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'water',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#09C9D4'},
+                {lightness: '70'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'poi.medical',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#EB3E4A'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'poi.school',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#09C9D4'},
+                {visibility: 'on'}
+            ]
+        },{
+            featureType: 'poi.sports_complex',
+            elementType: 'geometry',
+            stylers: [
+                {color: '#09C9D4'},
+                {visibility: 'on'}
+            ]
+        }
+    ]
+
     var map = new google.maps.Map(document.getElementById("map"), {
         center: myPos,
-        zoom: 15
+        zoom: 15,
+        styles: styles,
+        mapTypeControl: false
     });
 
     var marker = new google.maps.Marker({
@@ -25,6 +95,8 @@ function initMap() {
     marker.addListener('click', function() {
         infowindow.open(map, marker);
     });
+
+
 
 }
 
