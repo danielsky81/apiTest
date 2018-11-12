@@ -1,10 +1,63 @@
 function initMap() {
 
-    var map = new google.maps.Map(document.getElementById("map"), {
+    var styles = [
+        {
+            featureType: 'landscape',
+            elementType: 'all',
+            stylers: [
+                { color: '#11487D' }
+            ]
+        },
+        {
+            featureType: 'poi',
+            elementType: 'all',
+            stylers: [
+                { visibility: 'off' }
+            ]
+        },
+        {
+            featureType: 'administrative',
+            elementType: 'labels.text.fill',
+            stylers: [
+                { color: '#70D6BC' }
+            ]
+        },
+        {
+            featureType: 'administrative',
+            elementType: 'labels.text.stroke',
+            stylers: [
+                { visibility: 'off' }
+            ]
+        },
+        {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [
+                { color: '#38C7BD' }
+            ]
+        },
+        {
+            featureType: 'road',
+            elementType: 'labels',
+            stylers: [
+                { visibility: 'off' }
+            ]
+        },
+        {
+            featureType: 'water',
+            elementType: 'all',
+            stylers: [
+                { color: '#0E7FA6' }
+            ]
+        }
+    ]
+
+    var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 53.326116, lng: -7.946834},
-        zoom: 6
-        // styles: styles,
-        // mapTypeControl: false
+        zoom: 6,
+        styles: styles,
+        disableDefaultUI: true,
+        mapTypeControl: false
     });
 
     var surfSpots = [
@@ -31,7 +84,7 @@ function initMap() {
     ]
 
     var markers = [];
-
+    
     var infoWindow = new google.maps.InfoWindow();
 
     var bounds = new google.maps.LatLngBounds();
@@ -44,7 +97,10 @@ function initMap() {
             position: position,
             title: title,
             animation: google.maps.Animation.DROP,
-            id: i
+            id: i,
+            icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'
+              }
         });
         // Push marker to our array of markers
         markers.push(marker);
@@ -61,82 +117,12 @@ function initMap() {
     function populateInfoWindow(marker, infowindow) {
         if (infowindow.marker != marker) {
             infowindow.marker = marker;
-            infowindow.setContent('<div id="infoWindow">' + marker.title + '</div>');
+            infowindow.setContent('<div id=infoWindow>' + marker.title + '</div>');
             infowindow.open(map, marker);
             infowindow.addListener('closeclick', function() {
                 infowindow.setMarker = null;
             });
         }
     }
-
- 
-    // var styles = [
-    //     {
-    //         featureType: 'poi.park',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#45C48B'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'poi',
-    //         elementType: 'labels.text.fill',
-    //         stylers: [
-    //             {color: '#323741'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'poi',
-    //         elementType: 'labels.text.stroke',
-    //         stylers: [
-    //             {visibility: 'off'}
-    //         ]
-    //     },{
-    //         featureType: 'road',
-    //         elementType: 'geometry.stroke',
-    //         stylers: [
-    //             {color: '#323741'},
-    //             {lightness: '50'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'transit',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#FFD039'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'water',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#09C9D4'},
-    //             {lightness: '70'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'poi.medical',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#EB3E4A'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'poi.school',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#09C9D4'},
-    //             {visibility: 'on'}
-    //         ]
-    //     },{
-    //         featureType: 'poi.sports_complex',
-    //         elementType: 'geometry',
-    //         stylers: [
-    //             {color: '#09C9D4'},
-    //             {visibility: 'on'}
-    //         ]
-    //     }
-    // ]
-
 }
 
