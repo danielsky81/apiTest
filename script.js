@@ -1,5 +1,5 @@
 var surfSpots = [
-    {id: '01', title: 'Magheroarty, Co. Donegal', location: {lat: 55.162985, lng: -8.143272}},
+    {title: 'Magheroarty, Co. Donegal', location: {lat: 55.162985, lng: -8.143272}},
     {title: 'Falcarragh, Co. Donegal', location: {lat: 55.16073, lng: -8.085937}},
     {title: 'Rossnowlagh, Co. Donegal', location: {lat: 54.555689, lng: -8.210135}},
     {title: 'Bundoran, Co. Donegal', location: {lat: 54.508327, lng: -8.255281}},
@@ -144,7 +144,26 @@ xhr.onreadystatechange = function() {
 
     if (this.readyState == 4 && this.status == 200) {
         // console.log(this.responseText);
-        document.getElementById('data').innerHTML = this.responseText;
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+
+        var output = '';
+
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+
+        output += '<div>' +
+            '<ul>' +
+                '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+            '</ul>'
+
+            document.getElementById('data').innerHTML = output;
+
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }
