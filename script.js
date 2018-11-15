@@ -130,7 +130,7 @@ function initMap() {
 
 const lat = surfSpots[19].location['lat'];
 const lng = surfSpots[19].location['lng'];
-const params = 'waveHeight,airTemperature';
+const params = 'waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
@@ -154,12 +154,54 @@ xhr.onreadystatechange = function() {
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
 
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = weather.hours[0].swellPeriod[0].value;
+        var waterTemperature = weather.hours[0].waterTemperature[0].value;
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = weather.hours[0].waveHeight[0].value;
+        var wavePeriod = weather.hours[0].wavePeriod[0].value;
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = weather.hours[0].windSpeed[0].value;
+
+        function windDir() {
+            var windD = windDirection;
+            if (windD >= 0 && windD < 22.5 || windD >=337.5) {
+                return 'North';
+            } else if (windD >= 22.5 && windD < 67.5) {
+                return 'Northeast';
+            } else if (windD >= 67.5 && windD < 112.5) {
+                return 'East';
+            } else if (windD >= 112.5 && windD < 157.5) {
+                return 'Southeast';
+            } else if (windD >= 157.5 && windD < 202.5) {
+                return 'South';
+            } else if (windD >= 202.5 && windD < 247.5) {
+                    return 'Southwest';
+            } else if (windD >= 247.5 && windD <292.5) {
+                    return 'West';
+            } else if (windD >= 292.5 && windD <337.5) {
+                    return 'Northwest';
+            }
+        };
+
         output += '<div>' +
             '<ul>' +
                 '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
                 '<li>Date & Time: '+time+'</li>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Current Direction: '+currentDirection+'</li>' +
+                '<li>Swell Direction: '+swellDirection+'</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451<</li>' +
+                '<li>Wave Direction: '+waveDirection+'</li>' +
+                '<li>Wave Hight: '+waveHeight+'</li>' +
+                '<li>Wave Period: '+wavePeriod+'</li>' +
+                '<li>Wind Direction from: '+windDir()+'</li>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
             document.getElementById('data').innerHTML = output;
