@@ -130,7 +130,7 @@ function initMap() {
 
 const lat = surfSpots[19].location['lat'];
 const lng = surfSpots[19].location['lng'];
-const params = 'waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
+const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
@@ -147,6 +147,18 @@ xhr.onreadystatechange = function() {
         // document.getElementById('data').innerHTML = this.responseText;
         var weather = JSON.parse(this.responseText);
         console.log(weather);
+
+// Download JSON file:
+
+// var weatherJson = JSON.stringify(weather);
+// function download(content, fileName, contentType) {
+//     var a = document.createElement("a");
+//     var file = new Blob([content], {type: contentType});
+//     a.href = URL.createObjectURL(file);
+//     a.download = fileName;
+//     a.click();
+// }
+// download(weatherJson, 'json.json', 'text/plain');
 
         var output = '';
 
@@ -165,26 +177,31 @@ xhr.onreadystatechange = function() {
         var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
         var windSpeed = weather.hours[0].windSpeed[0].value;
 
-        function windDir() {
-            var windD = windDirection;
-            if (windD >= 0 && windD < 22.5 || windD >=337.5) {
+
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
                 return 'North';
-            } else if (windD >= 22.5 && windD < 67.5) {
+            } else if (value >= 22.5 && value < 67.5) {
                 return 'Northeast';
-            } else if (windD >= 67.5 && windD < 112.5) {
+            } else if (value >= 67.5 && value < 112.5) {
                 return 'East';
-            } else if (windD >= 112.5 && windD < 157.5) {
+            } else if (value >= 112.5 && value < 157.5) {
                 return 'Southeast';
-            } else if (windD >= 157.5 && windD < 202.5) {
+            } else if (value >= 157.5 && value < 202.5) {
                 return 'South';
-            } else if (windD >= 202.5 && windD < 247.5) {
+            } else if (value >= 202.5 && value < 247.5) {
                     return 'Southwest';
-            } else if (windD >= 247.5 && windD <292.5) {
+            } else if (value >= 247.5 && value <292.5) {
                     return 'West';
-            } else if (windD >= 292.5 && windD <337.5) {
+            } else if (value >= 292.5 && value <337.5) {
                     return 'Northwest';
             }
         };
+
+        var date = new Date();
+        var timestamp = date.getTime();
+
+        console.log
 
         output += '<div>' +
             '<ul>' +
@@ -192,15 +209,15 @@ xhr.onreadystatechange = function() {
                 '<li>Date & Time: '+time+'</li>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Wave Height: '+waveHeight+' m</li>' +
-                '<li>Current Direction: '+currentDirection+'</li>' +
-                '<li>Swell Direction: '+swellDirection+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 '<li>Swell Height: '+swellHeight+' m</li>' +
                 '<li>Swell Period: '+swellPeriod+' seconds</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451<</li>' +
-                '<li>Wave Direction: '+waveDirection+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
                 '<li>Wave Hight: '+waveHeight+'</li>' +
                 '<li>Wave Period: '+wavePeriod+'</li>' +
-                '<li>Wind Direction from: '+windDir()+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
@@ -216,6 +233,8 @@ xhr.onerror = function() {
 };
 
 xhr.send();
+
+
 
 
 // fetch(`https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, {
