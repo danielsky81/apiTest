@@ -13,12 +13,12 @@ var surfSpots = [
     {title: 'Inch Strand, Co. Kerry', location: {lat: 52.128852, lng: -9.955673}},
     {title: 'Barley Cove, Co. Cork', location: {lat: 51.469675, lng: -9.775343}},
     {title: 'Inchydoney, Co. Cork', location: {lat: 51.597281, lng: -8.861418}},
-    {title: 'Castlefreake, Co. Cork', location: {lat: 51.557116, lng: -8.966045}},
+    {title: 'Castlefreake, Co. Cork', location: {lat: 51.557116, lng: -8.966045}, point: 'Southwest'},
     {title: 'Garretstown, Co. Cork', location: {lat: 51.640394, lng: -8.564358}},
     {title: 'Tramore, Co. Waterford', location: {lat: 52.153083, lng: -7.107811}},
     {title: 'Portrush, Co. Antrim', location: {lat: 55.170241, lng: -6.731873}},
     {title: 'Magheramore, Co. Wicklow', location: {lat: 52.930841, lng: -6.023053}},
-    {title: 'Whiterock, County Dublin', location: {lat: 53.265934, lng: -6.106232}}
+    {title: 'Whiterock, County Dublin', location: {lat: 53.265934, lng: -6.106232}, point: 'Southeast'}
 ] 
 
 function initMap() {
@@ -126,14 +126,56 @@ function initMap() {
     }
 }
 
+// MetOffice UK API
+
+var key
+
 // Stormglass API
 
 const lat = surfSpots[19].location['lat'];
 const lng = surfSpots[19].location['lng'];
 const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
 
+// const polygon = surfSpots.map(function(spot) {
+//     return spot.location.lat;
+// })
+
+// var logSurfSpotsLat = surfSpots.map(function(spot) {
+//     return spot.location.lat;
+//   });
+  
+//   var logSurfSpotsLng = surfSpots.map(function(spot) {
+//     return spot.location.lng;
+//   });
+  
+//   var polygon = logSurfSpotsLat[17] +','+ logSurfSpotsLng[17] +':'+
+//     logSurfSpotsLat[1] +','+ logSurfSpotsLng[1] +':'+
+//     logSurfSpotsLat[0] +','+ logSurfSpotsLng[0] +':'+
+//     logSurfSpotsLat[2] +','+ logSurfSpotsLng[2] +':'+
+//     logSurfSpotsLat[3] +','+ logSurfSpotsLng[3] +':'+
+//     logSurfSpotsLat[4] +','+ logSurfSpotsLng[4] +':'+
+//     logSurfSpotsLat[5] +','+ logSurfSpotsLng[5] +':'+
+//     logSurfSpotsLat[6] +','+ logSurfSpotsLng[6] +':'+
+//     logSurfSpotsLat[7] +','+ logSurfSpotsLng[7] +':'+
+//     logSurfSpotsLat[8] +','+ logSurfSpotsLng[8] +':'+
+//     logSurfSpotsLat[9] +','+ logSurfSpotsLng[9] +':'+
+//     logSurfSpotsLat[10] +','+ logSurfSpotsLng[10] +':'+
+//     logSurfSpotsLat[11] +','+ logSurfSpotsLng[11] +':'+
+//     logSurfSpotsLat[12] +','+ logSurfSpotsLng[12] +':'+
+//     logSurfSpotsLat[14] +','+ logSurfSpotsLng[14] +':'+
+//     logSurfSpotsLat[13] +','+ logSurfSpotsLng[13] +':'+
+//     logSurfSpotsLat[15] +','+ logSurfSpotsLng[15] +':'+
+//     logSurfSpotsLat[16] +','+ logSurfSpotsLng[16] +':'+
+//     logSurfSpotsLat[18] +','+ logSurfSpotsLng[18] +':'+
+//     logSurfSpotsLat[19] +','+ logSurfSpotsLng[19];
+
+//     console.log(polygon);
+
+// var box = '60,20:58,17'
+
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
+// xhr.open('GET', `https://api.stormglass.io/point?box=${box}`, true);
 
 xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
 
@@ -150,18 +192,9 @@ xhr.onreadystatechange = function() {
 
 // Download JSON file:
 
-// var weatherJson = JSON.stringify(weather);
-// function download(content, fileName, contentType) {
-//     var a = document.createElement("a");
-//     var file = new Blob([content], {type: contentType});
-//     a.href = URL.createObjectURL(file);
-//     a.download = fileName;
-//     a.click();
-// }
-// download(weatherJson, 'json.json', 'text/plain');
-
         var output = '';
 
+        var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -169,14 +202,20 @@ xhr.onreadystatechange = function() {
         var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
         var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
         var swellHeight = weather.hours[0].swellHeight[0].value;
-        var swellPeriod = weather.hours[0].swellPeriod[0].value;
-        var waterTemperature = weather.hours[0].waterTemperature[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
         var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
-        var waveHeight = weather.hours[0].waveHeight[0].value;
-        var wavePeriod = weather.hours[0].wavePeriod[0].value;
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
         var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
-        var windSpeed = weather.hours[0].windSpeed[0].value;
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
 
+        var timeNow = new Date();
+
+        // Display time for tidal & temperature information
+
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
 
         function direction(value) {
             if (value >= 0 && value < 22.5 || value >=337.5) {
@@ -198,33 +237,36 @@ xhr.onreadystatechange = function() {
             }
         };
 
-        var date = new Date();
-        var timestamp = date.getTime();
-
-        console.log
 
         output += '<div>' +
             '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
                 '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
+                '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
                 '<li>Wave Height: '+waveHeight+' m</li>' +
-                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
-                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
                 '<li>Swell Height: '+swellHeight+' m</li>' +
                 '<li>Swell Period: '+swellPeriod+' seconds</li>' +
-                '<li>Water Temperature: '+waterTemperature+' &#8451<</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[19].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
-                '<li>Wave Hight: '+waveHeight+'</li>' +
-                '<li>Wave Period: '+wavePeriod+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
-            document.getElementById('data').innerHTML = output;
+            document.getElementById('data01').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
-        document.getElementById('data').innerHTML = 'Data request exceeded! Please come back tomorrow';
+        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }
 };
 
@@ -237,27 +279,750 @@ xhr.send();
 
 
 
-// fetch(`https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, {
-//   headers: {
-//     'Authorization': 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004'
-//   }
-// }).then(function(response) {
-//   // Do something with response data.
-//   return response.json();
-// //   console.log(jsonData);
-// }).then(function(data) {
-//     console.log(data);
-    
-//     let output = '<h2>Forecast</h2>';
-//     data.hours.forEach(function(weather) {
-//         output += `
-//         <div>
-//             <h2>Temp: ${weather[0].airTemperature[0].value}</h2>
-//             <h2>Wave height: ${weather[0].waveHeight[0].value}</h2>
-//         </div>
-//         `;
-//     });
-//     document.getElementById('data').innerText = output;
-// }).catch(function(error) {
-//     return console.log(error);
-// });
+const lata = surfSpots[0].location['lat'];
+const lnga = surfSpots[0].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${lata}&lng=${lnga}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[0].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[0].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data02').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const latb = surfSpots[1].location['lat'];
+const lngb = surfSpots[1].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${latb}&lng=${lngb}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[1].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[1].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data03').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data03').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const latc = surfSpots[2].location['lat'];
+const lngc = surfSpots[2].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${latc}&lng=${lngc}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[2].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[2].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data04').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data04').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+
+const latd = surfSpots[3].location['lat'];
+const lngd = surfSpots[3].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${latd}&lng=${lngd}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[3].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[3].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data05').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data05').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const late = surfSpots[4].location['lat'];
+const lnge = surfSpots[4].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${late}&lng=${lnge}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[4].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[4].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data06').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data06').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const latf = surfSpots[5].location['lat'];
+const lngf = surfSpots[5].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${latf}&lng=${lngf}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[5].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[5].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+            document.getElementById('data07').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data07').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const latg = surfSpots[6].location['lat'];
+const lngg = surfSpots[6].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${latg}&lng=${lngg}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[6].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[6].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+           document.getElementById('data08').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data08').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const lath = surfSpots[7].location['lat'];
+const lngh = surfSpots[7].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${lath}&lng=${lngh}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[7].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[7].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+           document.getElementById('data09').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data09').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
+
+const lati = surfSpots[8].location['lat'];
+const lngi = surfSpots[8].location['lng'];
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', `https://api.stormglass.io/point?lat=${lati}&lng=${lngi}&params=${params}`, true);
+xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // console.log(this.responseText);
+        // document.getElementById('data').innerHTML = this.responseText;
+        var weather = JSON.parse(this.responseText);
+        console.log(weather);
+        var output = '';
+        var seaLevel = weather.hours[0].seaLevel[0].value;
+        var time = weather.hours[0].time;
+        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
+        var swellHeight = weather.hours[0].swellHeight[0].value;
+        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
+        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
+        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
+        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var timeNow = new Date();
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 'North';
+            } else if (value >= 22.5 && value < 67.5) {
+                return 'Northeast';
+            } else if (value >= 67.5 && value < 112.5) {
+                return 'East';
+            } else if (value >= 112.5 && value < 157.5) {
+                return 'Southeast';
+            } else if (value >= 157.5 && value < 202.5) {
+                return 'South';
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 'Southwest';
+            } else if (value >= 247.5 && value <292.5) {
+                    return 'West';
+            } else if (value >= 292.5 && value <337.5) {
+                    return 'Northwest';
+            }
+        };
+        output += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpots[8].title+'</li>' +
+                '<br>' +
+                '<li>Date & Time: '+time+'</li>' +
+                '<li>Tide size: '+seaLevel+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<li>Swell Height: '+swellHeight+' m</li>' +
+                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpots[8].point+'</li>' +
+                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+           document.getElementById('data10').innerHTML = output;
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data10').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }
+};
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+xhr.send();
