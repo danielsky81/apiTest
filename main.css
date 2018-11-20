@@ -1,5 +1,5 @@
 body {
-    background-color: #001747;
+    background-color: #0E7FA6;
 }
 
 /* img {
@@ -17,7 +17,7 @@ div .col-xs-12 {
     border-radius: 10px;
 }
 
-div .col-xs-3 {
+div .col-xs-12 {
     min-height: 80vh;
     /* width: 250px; */
     /* margin: 10px 10px; */
@@ -31,5 +31,5 @@ div .col-xs-3 {
 }
 
 .forecast {
-    background-color: #0E7FA6;
+    color: white;
 }
