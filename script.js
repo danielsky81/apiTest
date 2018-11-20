@@ -134,7 +134,7 @@ var key
 
 const lat = surfSpots[19].location['lat'];
 const lng = surfSpots[19].location['lng'];
-const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
+const params = 'waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
 
 // const polygon = surfSpots.map(function(spot) {
 //     return spot.location.lat;
@@ -194,7 +194,7 @@ xhr.onreadystatechange = function() {
 
         var output = '';
 
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -244,7 +244,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -292,7 +292,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -334,7 +334,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[0].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -375,7 +375,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -417,7 +417,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[1].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -458,7 +458,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -500,7 +500,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[2].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -542,7 +542,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -584,7 +584,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[3].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -625,7 +625,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -667,7 +667,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[4].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -708,7 +708,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -750,7 +750,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[5].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -791,7 +791,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -833,7 +833,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[6].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -874,7 +874,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -916,7 +916,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[7].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -957,7 +957,7 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
         var output = '';
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
@@ -999,7 +999,7 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[8].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
+                // '<li>Tide size: '+seaLevel+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
