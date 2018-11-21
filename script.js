@@ -186,11 +186,34 @@ xhr.onreadystatechange = function() {
         var weather = JSON.parse(this.responseText);
         console.log(weather);
 
-// Download JSON file:
-
         var output = '';
 
-        var seaLevel = weather.hours[0].seaLevel[0].value;
+        // var seaLevel = weather.hours[0].seaLevel[0].value;
+         
+        // var seaLevel = '';
+        var seaLevel = [];
+        // Data for a day -> starting 00:00 am until 11:00 pm (tidal info every 4 hours)
+        // High/Low tides occur 12h 25m apart, so change from High to Low tide occurs every 6h and 12.5m
+        var tides = weather.hours.slice(0, 24);
+        // console.log(tides);
+        // for (i = 0; i < tides.length; i ++) {
+            // console.log(tides[i].seaLevel[0].value);
+            // seaLevel = tides[i].seaLevel[0].value;
+        // };
+
+        tides.forEach(function(tide) {
+            seaLevel.push(tide.seaLevel[0].value)
+        });
+
+        var tideHigh = Math.max(...seaLevel);
+        var tideLow = Math.min(...seaLevel);
+
+        console.log('Tides as follows, High: '+tideHigh+' , and Low: '+tideLow);
+
+        // or with forEach()
+
+    console.log(seaLevel);
+
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
