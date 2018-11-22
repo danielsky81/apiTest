@@ -21,6 +21,8 @@ var surfSpots = [
     {title: 'Whiterock, County Dublin', location: {lat: 53.265934, lng: -6.106232}, point: 'Southeast'}
 ] 
 
+// ****************************************************************** Google Maps API
+
 function initMap() {
 
     var styles = [
@@ -126,48 +128,57 @@ function initMap() {
     }
 }
 
-// Stormglass API
+// ****************************************************************** OpenWeatherMap API
 
-const lat = surfSpots[19].location['lat'];
-const lng = surfSpots[19].location['lng'];
+const lat = surfSpots[8].location['lat'];
+const lng = surfSpots[8].location['lng'];
+
+var apiOpenWeather = '74ecf887ea2ee80ab6586f67dfe5ee24';
+
+var xhr = new XMLHttpRequest();
+
+xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&APPID=${apiOpenWeather}`, true);
+
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var openWeather = JSON.parse(this.responseText);
+        console.log(openWeather);
+
+        var output = '';
+        function unixToLocal(t) {
+            var dt = new Date(t*1000);
+            var hr = dt.getHours();
+            var m = '0' + dt.getMinutes();
+            return hr+ ':' +m.substr(-2); 
+        }
+
+        var sunrise = openWeather.sys.sunrise;
+        var sunset = openWeather.sys.sunset;
+
+        console.log(unixToLocal(sunrise));
+        console.log(unixToLocal(sunset));
+        console.log(openWeather.weather[0].main);
+        console.log(openWeather.main.temp);
+        console.log(openWeather.wind.speed);
+        console.log(openWeather.weather[0].description);
+
+
+
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }  
+};
+
+xhr.onerror = function() {
+    console.log('Request error: ');
+};
+
+xhr.send();
+
+// ****************************************************************** Stormglass API
+
+
 const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
-
-// const polygon = surfSpots.map(function(spot) {
-//     return spot.location.lat;
-// })
-
-// var logSurfSpotsLat = surfSpots.map(function(spot) {
-//     return spot.location.lat;
-//   });
-  
-//   var logSurfSpotsLng = surfSpots.map(function(spot) {
-//     return spot.location.lng;
-//   });
-  
-//   var polygon = logSurfSpotsLat[17] +','+ logSurfSpotsLng[17] +':'+
-//     logSurfSpotsLat[1] +','+ logSurfSpotsLng[1] +':'+
-//     logSurfSpotsLat[0] +','+ logSurfSpotsLng[0] +':'+
-//     logSurfSpotsLat[2] +','+ logSurfSpotsLng[2] +':'+
-//     logSurfSpotsLat[3] +','+ logSurfSpotsLng[3] +':'+
-//     logSurfSpotsLat[4] +','+ logSurfSpotsLng[4] +':'+
-//     logSurfSpotsLat[5] +','+ logSurfSpotsLng[5] +':'+
-//     logSurfSpotsLat[6] +','+ logSurfSpotsLng[6] +':'+
-//     logSurfSpotsLat[7] +','+ logSurfSpotsLng[7] +':'+
-//     logSurfSpotsLat[8] +','+ logSurfSpotsLng[8] +':'+
-//     logSurfSpotsLat[9] +','+ logSurfSpotsLng[9] +':'+
-//     logSurfSpotsLat[10] +','+ logSurfSpotsLng[10] +':'+
-//     logSurfSpotsLat[11] +','+ logSurfSpotsLng[11] +':'+
-//     logSurfSpotsLat[12] +','+ logSurfSpotsLng[12] +':'+
-//     logSurfSpotsLat[14] +','+ logSurfSpotsLng[14] +':'+
-//     logSurfSpotsLat[13] +','+ logSurfSpotsLng[13] +':'+
-//     logSurfSpotsLat[15] +','+ logSurfSpotsLng[15] +':'+
-//     logSurfSpotsLat[16] +','+ logSurfSpotsLng[16] +':'+
-//     logSurfSpotsLat[18] +','+ logSurfSpotsLng[18] +':'+
-//     logSurfSpotsLat[19] +','+ logSurfSpotsLng[19];
-
-//     console.log(polygon);
-
-// var box = '60,20:58,17'
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
@@ -193,7 +204,7 @@ xhr.onreadystatechange = function() {
         // var seaLevel = '';
         var seaLevel = [];
         // Data for a day -> starting 00:00 am until 11:00 pm (tidal info every 4 hours)
-        // High/Low tides occur 12h 25m apart, so change from High to Low tide occurs every 6h and 12.5m
+        // High and Low tides occurs 12h 25m apart, so change from High to Low tide occurs every 6h and 12.5m
         var tides = weather.hours.slice(0, 24);
         // console.log(tides);
         // for (i = 0; i < tides.length; i ++) {
@@ -205,10 +216,19 @@ xhr.onreadystatechange = function() {
             seaLevel.push(tide.seaLevel[0].value)
         });
 
-        var tideHigh = Math.max(...seaLevel);
-        var tideLow = Math.min(...seaLevel);
+        // Calculation of average value
+        var sum = 0;
+        for ( var i = 0; i < seaLevel.length; i++) {
+            sum += parseInt(seaLevel[i], 24);
+        }
+        var seaLevelAverage = (sum/seaLevel.length).toFixed(1);
 
-        console.log('Tides as follows, High: '+tideHigh+' , and Low: '+tideLow);
+        console.log(seaLevelAverage);
+
+        // var tideHigh = Math.max(...seaLevel);
+        // var tideLow = Math.min(...seaLevel);
+
+        // console.log('Tides as follows, High: '+tideHigh+' , and Low: '+tideLow);
 
         // or with forEach()
 
@@ -230,6 +250,8 @@ xhr.onreadystatechange = function() {
         var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
 
         var timeNow = new Date();
+
+        console.log(timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
 
         // Display time for tidal & temperature information
 
@@ -260,23 +282,24 @@ xhr.onreadystatechange = function() {
         output += '<div>' +
             '<ul>' +
                 '<li>Today is: '+timeNow+'</li>'+
-                '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
+                '<li>Surf Spot: '+surfSpots[8].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
                 '<li>Tide size: '+seaLevel+'</li>' +
+                '<li>Tide average: '+seaLevelAverage+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
                 '<br>' +
                 '<li>Wave Height: '+waveHeight+' m</li>' +
                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
-                '<li>Swell Height: '+swellHeight+' m</li>' +
-                '<li>Swell Period: '+swellPeriod+' seconds</li>' +
+                // '<li>Swell Height: '+swellHeight+' m</li>' +
+                // '<li>Swell Period: '+swellPeriod+' seconds</li>' +
                 '<br>' +
-                '<li>Surf Spot pointing: '+surfSpots[19].point+'</li>' +
-                '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
+                '<li>Surf Spot pointing: '+surfSpots[8].point+'</li>' +
+                // '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-                '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
+                // '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
                 '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
