@@ -174,33 +174,19 @@ xhr.onreadystatechange = function() {
             document.getElementById('data02').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
-        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
+        document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }  
 };
 
 xhr.onerror = function() {
-    console.log('Request error: ');
+    console.log('Request error');
 };
 
 xhr.send();
 
-// ****************************************************************** Admiralty API
-
-const url = 'https://admiraltyapi.azure-api.net/uktidalapi/api/V1/Stations/0652/TidalEvents?duration=1'; // site that doesn’t send Access-Control-*
-const proxyurl = "https://cors-anywhere.herokuapp.com/";
-fetch(proxyurl + url, {
-    headers: {
-        'Ocp-Apim-Subscription-Key': '12ac8ce4f4af4e2d91069439ef66d9f4'
-    }
-}) // https://cors-anywhere.herokuapp.com/https://example.com
-.then(response => response.json())
-.then(tidesData => console.log(tidesData[0].EventType + ' at ' + tidesData[0].DateTime + ' having ' + (tidesData[0].Height).toFixed(1) + ' m'))
-.catch(() => console.log("Can’t access " + url + " response. Blocked by browser?"))
-
-
 // ****************************************************************** Stormglass API
 
-const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
+const params = 'airTemperature,waterTemperature,waveHeight,wavePeriod,swellDirection,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
@@ -218,10 +204,10 @@ xhr.onreadystatechange = function() {
         // var seaLevel = weather.hours[0].seaLevel[0].value;
          
         // var seaLevel = '';
-        var seaLevel = [];
+        // var seaLevel = [];
         // Data for a day -> starting 00:00 am until 11:00 pm (tidal info every 4 hours)
         // High and Low tides occurs 12h 25m apart, so change from High to Low tide occurs every 6h and 12.5m
-        var tides = weather.hours.slice(0, 24);
+        // var tides = weather.hours.slice(0, 24);
         // console.log(tides);
         // for (i = 0; i < tides.length; i ++) {
             // console.log(tides[i].seaLevel[0].value);
@@ -233,11 +219,11 @@ xhr.onreadystatechange = function() {
         // });
 
         // Calculation of average value
-        var sum = 0;
-        for ( var i = 0; i < seaLevel.length; i++) {
-            sum += parseInt(seaLevel[i], 24);
-        }
-        var seaLevelAverage = (sum/seaLevel.length).toFixed(1);
+        // var sum = 0;
+        // for ( var i = 0; i < seaLevel.length; i++) {
+        //     sum += parseInt(seaLevel[i], 24);
+        // }
+        // var seaLevelAverage = (sum/seaLevel.length).toFixed(1);
 
         // console.log(seaLevelAverage);
 
@@ -252,16 +238,10 @@ xhr.onreadystatechange = function() {
 
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
-        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
-
-        var currentDirection = (weather.hours[0].currentDirection[0].value).toFixed(1);
-        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
-        var swellHeight = weather.hours[0].swellHeight[0].value;
-        var swellPeriod = Math.round(weather.hours[0].swellPeriod[0].value);
         var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
-        var waveDirection = (weather.hours[0].waveDirection[0].value).toFixed(1);
         var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
         var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
+        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
         var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
         var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
 
@@ -309,13 +289,9 @@ xhr.onreadystatechange = function() {
                 '<br>' +
                 '<li>Wave Height: '+waveHeight+' m</li>' +
                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
-                // '<li>Swell Height: '+swellHeight+' m</li>' +
-                // '<li>Swell Period: '+swellPeriod+' seconds</li>' +
                 '<br>' +
                 '<li>Surf Spot pointing: '+surfSpots[19].point+'</li>' +
-                // '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-                // '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
                 '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
