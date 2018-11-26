@@ -128,10 +128,10 @@ function initMap() {
     }
 }
 
-// ****************************************************************** OpenWeatherMap API
+const lat = surfSpots[19].location['lat'];
+const lng = surfSpots[19].location['lng'];
 
-const lat = surfSpots[8].location['lat'];
-const lng = surfSpots[8].location['lng'];
+// ****************************************************************** OpenWeatherMap API
 
 var apiOpenWeather = '74ecf887ea2ee80ab6586f67dfe5ee24';
 
@@ -142,9 +142,10 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        console.log(openWeather);
+        // console.log(openWeather);
 
         var output = '';
+
         function unixToLocal(t) {
             var dt = new Date(t*1000);
             var hr = dt.getHours();
@@ -155,14 +156,22 @@ xhr.onreadystatechange = function() {
         var sunrise = openWeather.sys.sunrise;
         var sunset = openWeather.sys.sunset;
 
-        console.log(unixToLocal(sunrise));
-        console.log(unixToLocal(sunset));
-        console.log(openWeather.weather[0].main);
-        console.log(openWeather.main.temp);
-        console.log(openWeather.wind.speed);
-        console.log(openWeather.weather[0].description);
+        // console.log(unixToLocal(sunrise));
+        // console.log(unixToLocal(sunset));
+        // console.log(openWeather.weather[0].main);
+        // console.log(openWeather.main.temp);
+        // console.log(openWeather.wind.speed);
+        // console.log(openWeather.weather[0].description);
 
+        output += '<div>' +
+            '<ul>' +
+                '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
+                '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
+                '<br>' +
+                '<li>Weather: '+openWeather.weather[0].main+'</li>' +
+            '</ul>'
 
+            document.getElementById('data02').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -175,27 +184,34 @@ xhr.onerror = function() {
 
 xhr.send();
 
-// ****************************************************************** Stormglass API
+// ****************************************************************** Admiralty API
 
+const url = 'https://admiraltyapi.azure-api.net/uktidalapi/api/V1/Stations/0652/TidalEvents?duration=1'; // site that doesn’t send Access-Control-*
+const proxyurl = "https://cors-anywhere.herokuapp.com/";
+fetch(proxyurl + url, {
+    headers: {
+        'Ocp-Apim-Subscription-Key': '12ac8ce4f4af4e2d91069439ef66d9f4'
+    }
+}) // https://cors-anywhere.herokuapp.com/https://example.com
+.then(response => response.json())
+.then(tidesData => console.log(tidesData[0].EventType + ' at ' + tidesData[0].DateTime + ' having ' + (tidesData[0].Height).toFixed(1) + ' m'))
+.catch(() => console.log("Can’t access " + url + " response. Blocked by browser?"))
+
+
+// ****************************************************************** Stormglass API
 
 const params = 'seaLevel,waveHeight,airTemperature,currentDirection,swellDirection,swellHeight,swellPeriod,waterTemperature,waveDirection,waveHeight,wavePeriod,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
-// xhr.open('GET', `https://api.stormglass.io/point?box=${box}`, true);
 
 xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891282a-e610-11e8-83ef-0242ac130004');
 
 xhr.onreadystatechange = function() {
 
-    // console.log('READYSTATE: ', xhr.readyState);
-    // console.log('STATUS: ', xhr.status);
-
     if (this.readyState == 4 && this.status == 200) {
-        // console.log(this.responseText);
-        // document.getElementById('data').innerHTML = this.responseText;
         var weather = JSON.parse(this.responseText);
-        console.log(weather);
+        // console.log(weather);
 
         var output = '';
 
@@ -212,9 +228,9 @@ xhr.onreadystatechange = function() {
             // seaLevel = tides[i].seaLevel[0].value;
         // };
 
-        tides.forEach(function(tide) {
-            seaLevel.push(tide.seaLevel[0].value)
-        });
+        // tides.forEach(function(tide) {
+        //     seaLevel.push(tide.seaLevel[0].value)
+        // });
 
         // Calculation of average value
         var sum = 0;
@@ -223,7 +239,7 @@ xhr.onreadystatechange = function() {
         }
         var seaLevelAverage = (sum/seaLevel.length).toFixed(1);
 
-        console.log(seaLevelAverage);
+        // console.log(seaLevelAverage);
 
         // var tideHigh = Math.max(...seaLevel);
         // var tideLow = Math.min(...seaLevel);
@@ -232,7 +248,7 @@ xhr.onreadystatechange = function() {
 
         // or with forEach()
 
-    console.log(seaLevel);
+    // console.log(seaLevel);
 
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
@@ -282,7 +298,7 @@ xhr.onreadystatechange = function() {
         output += '<div>' +
             '<ul>' +
                 '<li>Today is: '+timeNow+'</li>'+
-                '<li>Surf Spot: '+surfSpots[8].title+'</li>' +
+                '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
                 '<li>Tide size: '+seaLevel+'</li>' +
@@ -296,7 +312,7 @@ xhr.onreadystatechange = function() {
                 // '<li>Swell Height: '+swellHeight+' m</li>' +
                 // '<li>Swell Period: '+swellPeriod+' seconds</li>' +
                 '<br>' +
-                '<li>Surf Spot pointing: '+surfSpots[8].point+'</li>' +
+                '<li>Surf Spot pointing: '+surfSpots[19].point+'</li>' +
                 // '<li>Current Direction from: '+direction(currentDirection)+'</li>' +
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 // '<li>Wave Direction from: '+direction(waveDirection)+'</li>' +
@@ -306,6 +322,8 @@ xhr.onreadystatechange = function() {
             '</ul>'
 
             document.getElementById('data01').innerHTML = output;
+
+            console.log(weather);
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
