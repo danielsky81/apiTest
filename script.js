@@ -281,8 +281,6 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
                 '<br>' +
                 '<li>Date & Time: '+time+'</li>' +
-                '<li>Tide size: '+seaLevel+'</li>' +
-                '<li>Tide average: '+seaLevelAverage+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
