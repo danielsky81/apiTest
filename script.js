@@ -171,10 +171,10 @@ xhr.onreadystatechange = function() {
                 '<li>Weather: '+openWeather.weather[0].main+'</li>' +
             '</ul>'
 
-            document.getElementById('data02').innerHTML = output;
+            document.getElementById('data01').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
-        document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
+        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }  
 };
 
@@ -200,41 +200,6 @@ xhr.onreadystatechange = function() {
         // console.log(weather);
 
         var output = '';
-
-        // var seaLevel = weather.hours[0].seaLevel[0].value;
-         
-        // var seaLevel = '';
-        // var seaLevel = [];
-        // Data for a day -> starting 00:00 am until 11:00 pm (tidal info every 4 hours)
-        // High and Low tides occurs 12h 25m apart, so change from High to Low tide occurs every 6h and 12.5m
-        // var tides = weather.hours.slice(0, 24);
-        // console.log(tides);
-        // for (i = 0; i < tides.length; i ++) {
-            // console.log(tides[i].seaLevel[0].value);
-            // seaLevel = tides[i].seaLevel[0].value;
-        // };
-
-        // tides.forEach(function(tide) {
-        //     seaLevel.push(tide.seaLevel[0].value)
-        // });
-
-        // Calculation of average value
-        // var sum = 0;
-        // for ( var i = 0; i < seaLevel.length; i++) {
-        //     sum += parseInt(seaLevel[i], 24);
-        // }
-        // var seaLevelAverage = (sum/seaLevel.length).toFixed(1);
-
-        // console.log(seaLevelAverage);
-
-        // var tideHigh = Math.max(...seaLevel);
-        // var tideLow = Math.min(...seaLevel);
-
-        // console.log('Tides as follows, High: '+tideHigh+' , and Low: '+tideLow);
-
-        // or with forEach()
-
-    // console.log(seaLevel);
 
         var time = weather.hours[0].time;
         var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
@@ -295,17 +260,56 @@ xhr.onreadystatechange = function() {
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
-            document.getElementById('data01').innerHTML = output;
+            document.getElementById('data02').innerHTML = output;
 
             console.log(weather);
 
     } else if (this.readyState == 4 && this.status == 402) {
-        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
+        document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }
 };
 
 xhr.onerror = function() {
     console.log('Request error: ');
+};
+
+xhr.send();
+
+// ****************************************************************** Marine Institute of Ireland data
+
+var xhr = new XMLHttpRequest();
+
+var timeFrom = '2018-11-26T00%3A00%3A00Z';
+var timeTo = '2018-11-29T00%3A00%3A00Z';
+var stationId = '%22Dublin%20Port%22';
+
+xhr.open('GET', `https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID%3E=${stationId}`, true);
+
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var tidePrediction = JSON.parse(this.responseText);
+        console.log(tidePrediction.table.rows[0] + ' + ' + tidePrediction.table.rows[10]);
+
+        // var time = tidePrediction.rows
+        // var output = '';
+
+        // output += '<div>' +
+        //     '<ul>' +
+        //         '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
+        //         '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
+        //         '<br>' +
+        //         '<li>Weather: '+openWeather.weather[0].main+'</li>' +
+        //     '</ul>'
+
+        //     document.getElementById('data03').innerHTML = output;
+
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data03').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }  
+};
+
+xhr.onerror = function() {
+    console.log('Request error');
 };
 
 xhr.send();
