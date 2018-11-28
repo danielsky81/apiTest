@@ -142,7 +142,7 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        // console.log(openWeather);
+        console.log(openWeather);
 
         var output = '';
 
@@ -201,14 +201,14 @@ xhr.onreadystatechange = function() {
 
         var output = '';
 
-        var time = weather.hours[0].time;
-        var airTemperature = Math.round(weather.hours[0].airTemperature[0].value);
-        var waterTemperature = Math.round(weather.hours[0].waterTemperature[0].value);
-        var waveHeight = (weather.hours[0].waveHeight[0].value).toFixed(1);
-        var wavePeriod = Math.round(weather.hours[0].wavePeriod[0].value);
-        var swellDirection = (weather.hours[0].swellDirection[0].value).toFixed(1);
-        var windDirection = (weather.hours[0].windDirection[0].value).toFixed(1);
-        var windSpeed = Math.round(weather.hours[0].windSpeed[0].value);
+        var time = weather.hours[12].time;
+        var airTemperature = Math.round(weather.hours[12].airTemperature[0].value);
+        var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
+        var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
+        var swellDirection = (weather.hours[12].swellDirection[0].value).toFixed(1);
+        var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
 
         var timeNow = new Date();
 
