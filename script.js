@@ -142,7 +142,7 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        console.log(openWeather);
+        // console.log(openWeather);
 
         var output = '';
 
@@ -185,7 +185,7 @@ xhr.onerror = function() {
 xhr.send();
 
 // ****************************************************************** Stormglass API
-
+/*
 const params = 'airTemperature,waterTemperature,waveHeight,wavePeriod,swellDirection,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
@@ -274,9 +274,76 @@ xhr.onerror = function() {
 };
 
 xhr.send();
-
+*/
 // ****************************************************************** Marine Institute of Ireland data
 
+var timeFrom = '2018-11-26T00%3A00%3A00Z';
+var timeTo = '2018-11-29T00%3A00%3A00Z';
+var stationId = '%22Dublin_Port%22';
+
+d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID=${stationId}`)
+    .then( function(data) {
+        console.log(data);
+
+        var tidePrediction = data.table.rows[0][2];
+        console.log(tidePrediction);
+
+        var tidesTime = [];
+        var tidesValue = [];
+        var tidesTimeValue = {};
+
+        // data.table.rows.forEach(function(d) {
+        //     console.log(d);
+        //     tidesDaily.push(d);
+        // });
+
+        // console.log(tidesDaily);
+
+        var delta = 10;
+        console.log(data.table.rows.length);
+        console.log(delta);
+
+        for (i = 0; i < data.table.rows.length; i = i + delta) {
+            tidesTime.push(data.table.rows[i][0]);
+        }
+
+        for (i = 0; i < data.table.rows.length; i = i + delta) {
+            tidesValue.push(data.table.rows[i][2]);
+        }
+
+        tidesTime.forEach(function (time, i) {
+            return tidesTimeValue[time] = tidesValue[i];
+        });
+
+        console.log(tidesTimeValue);
+
+        var h = 400;
+        var w = 400;
+        var barPadding = 1;
+
+        var svg = d3.select('#data03')
+            .append('svg')
+            .attr('height', h)
+            .attr('width', w);
+        
+        svg.selectAll('rect')
+            .data(tidesTimeValue)
+            .enter()
+            .append('rect')
+            .attr('x', function(d, i) {
+                return i * (w / tidesTimeValue.length);
+            })
+            .attr('y', function (d) {
+                return h - d;
+            })
+            .attr('height', function (d) {
+                return d;
+            })
+            .attr('width', w / tidesTimeValue.length - barPadding);
+
+    });
+
+/*
 var xhr = new XMLHttpRequest();
 
 var timeFrom = '2018-11-26T00%3A00%3A00Z';
@@ -288,7 +355,27 @@ xhr.open('GET', `https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.jso
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var tidePrediction = JSON.parse(this.responseText);
-        console.log(tidePrediction.table.rows[0] + ' + ' + tidePrediction.table.rows[10]);
+        console.log(tidePrediction);
+        console.log(tidePrediction.table.rows[0][2] + ' + ' + tidePrediction.table.rows[10][2]);
+
+        // var a = function timeJson (i) {
+        //     return tidePrediction.table.rows[i][0];
+        // };
+
+        // var b = function tideJson (i) {
+        //     return tidePrediction.table.rows[i][2]
+        // };
+
+        // console.log(a(0));
+        // console.log(b(10));
+
+        // var dataset = [{
+        //     '${a(0)}': '${b(0)}'
+        // },{
+        //     '${a(10)}': '${b(10)}'
+        // }];
+
+        // console.log(dataset);
 
         // var time = tidePrediction.rows
         // var output = '';
@@ -313,3 +400,30 @@ xhr.onerror = function() {
 };
 
 xhr.send();
+*/
+
+// var h = 100;
+// var w = 500;
+// var ds; // global var for dataset
+
+// var timeFrom = '2018-11-26T00%3A00%3A00Z';
+// var timeTo = '2018-11-29T00%3A00%3A00Z';
+// var stationId = '%22Dublin%20Port%22';
+
+// d3.json('https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=2018-11-26T00%3A00%3A00Z&time%3C=2018-11-29T00%3A00%3A00Z&stationID%3E=%22Dublin%20Port%22', function (error, data) {
+//     if (error) {
+//         console.log(error);
+//     } else {
+//         console.log(data);
+//     }
+
+//     var decodedData = JSON.parse(data.table);
+
+//     console.log(decodedData.table);
+
+// });
+
+// d3.select('#data03')
+//     .append('h1')
+//     .text('Test chart');
+
