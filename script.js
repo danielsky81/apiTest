@@ -277,10 +277,10 @@ xhr.send();
 */
 // ****************************************************************** Marine Institute of Ireland data
 
-var timeFrom = '2018-11-26T00%3A00%3A00Z';
-var timeTo = '2018-11-29T00%3A00%3A00Z';
+var timeFrom = '2018-11-30T00%3A00%3A00Z';
+var timeTo = '2018-12-01T00%3A00%3A00Z';
 var stationId = '%22Dublin_Port%22';
-
+/*
 d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID=${stationId}`)
     .then( function(data) {
         console.log(data);
@@ -291,13 +291,6 @@ d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2
         var tidesTime = [];
         var tidesValue = [];
         var tidesTimeValue = {};
-
-        // data.table.rows.forEach(function(d) {
-        //     console.log(d);
-        //     tidesDaily.push(d);
-        // });
-
-        // console.log(tidesDaily);
 
         var delta = 10;
         console.log(data.table.rows.length);
@@ -341,22 +334,99 @@ d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2
             })
             .attr('width', w / tidesTimeValue.length - barPadding);
 
-    });
+    }); 
+    */
 
-/*
+
 var xhr = new XMLHttpRequest();
-
-var timeFrom = '2018-11-26T00%3A00%3A00Z';
-var timeTo = '2018-11-29T00%3A00%3A00Z';
-var stationId = '%22Dublin%20Port%22';
 
 xhr.open('GET', `https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID%3E=${stationId}`, true);
 
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-        var tidePrediction = JSON.parse(this.responseText);
+        var data = JSON.parse(this.responseText);
+        console.log(data);
+        // console.log(data.table.rows[0][2] + ' + ' + data.table.rows[10][2]);
+
+        // D3.js DATA
+
+        var tidePrediction = data.table.rows[0][2];
         console.log(tidePrediction);
-        console.log(tidePrediction.table.rows[0][2] + ' + ' + tidePrediction.table.rows[10][2]);
+
+        var tidesTime = [];
+        var tidesValue = [];
+        var tidesTimeValue = {};
+
+        var delta = 10;
+        console.log(data.table.rows.length);
+        console.log(delta);
+
+        // for (i = 0; i < data.table.rows.length; i = i + delta) {
+        //     tidesTime.push(data.table.rows[i][0]);
+        // }
+
+        for (i = 0; i < 250; i = i + delta) {
+            tidesTime.push(data.table.rows[i][0]);
+        }
+
+        // for (i = 0; i < data.table.rows.length; i = i + delta) {
+        //     tidesValue.push(data.table.rows[i][2]);
+        // }
+
+        for (i = 0; i < 250; i = i + delta) {
+            tidesValue.push(data.table.rows[i][2]);
+        }
+
+        tidesTime.forEach(function (time, i) {
+            return tidesTimeValue[time] = tidesValue[i];
+        });
+
+        console.log(tidesTime);
+        console.log(tidesValue);
+        console.log(tidesTimeValue);
+
+        var output_data = {
+            element: []
+        };
+
+        for (var key in tidesTimeValue) {
+            var output = {};
+            output.time = tidesTimeValue[key];
+            output_data.element.push(output);
+        }
+
+        console.log(output_data.element);
+
+        var ndx = crossfilter(tidesTimeValue);
+
+        var name_dim = ndx.dimension(dc.pluck('name'));
+
+        var h = 400;
+        var w = 400;
+        var barPadding = 1;
+
+        var svg = d3.select('#data03')
+            .append('svg')
+            .attr('height', h)
+            .attr('width', w);
+        
+        svg.selectAll('rect')
+            .data(tidesTimeValue)
+            .enter()
+            .append('rect')
+            .attr('x', function(d, i) {
+                return i * (w / tidesTimeValue.length);
+            })
+            .attr('y', function (d) {
+                return h - d;
+            })
+            .attr('height', function (d) {
+                return d;
+            })
+            .attr('width', w / tidesTimeValue.length - barPadding);
+
+
+        // SOME OTHER STUFF
 
         // var a = function timeJson (i) {
         //     return tidePrediction.table.rows[i][0];
@@ -400,7 +470,7 @@ xhr.onerror = function() {
 };
 
 xhr.send();
-*/
+
 
 // var h = 100;
 // var w = 500;
