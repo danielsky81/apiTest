@@ -33,3 +33,8 @@ div .col-xs-4 {
 .forecast {
     color: white;
 }
+
+.bar {
+    fill: white;
+    radius: 5px;
+}

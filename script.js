@@ -351,15 +351,15 @@ xhr.onreadystatechange = function() {
         // D3.js DATA
 
         var tidePrediction = data.table.rows[0][2];
-        console.log(tidePrediction);
+        // console.log(tidePrediction);
 
         var tidesTime = [];
         var tidesValue = [];
         var tidesTimeValue = {};
 
         var delta = 10;
-        console.log(data.table.rows.length);
-        console.log(delta);
+        // console.log(data.table.rows.length);
+        // console.log(delta);
 
         // for (i = 0; i < data.table.rows.length; i = i + delta) {
         //     tidesTime.push(data.table.rows[i][0]);
@@ -383,47 +383,196 @@ xhr.onreadystatechange = function() {
 
         console.log(tidesTime);
         console.log(tidesValue);
+        console.log(tidesValue.lenght);
         console.log(tidesTimeValue);
 
-        var output_data = {
-            element: []
-        };
+        // var output_data = {
+        //     element: []
+        // };
 
-        for (var key in tidesTime) {
-            var output = {};
-            output.time = tidesTime[key];
-            output_data.element.push(output);
-        }
+        // for (var key in tidesTime) {
+        //     var output = {};
+        //     output.time = tidesTime[key];
+        //     output_data.element.push(output);
+        // }
 
-        console.log(output_data.element);
+        // console.log(output_data.element);
 
-        var ndx = crossfilter(tidesTimeValue);
+        // var ndx = crossfilter(tidesTimeValue);
 
-        var name_dim = ndx.dimension(dc.pluck('name'));
+        // var name_dim = ndx.dimension(dc.pluck('tidesTimeValue'));
 
-        var h = 400;
-        var w = 400;
-        var barPadding = 1;
+        // dc.barChart('#data03')
+        //     .width(400)
+        //     .height(400)
+        //     .dimension(name_dim)
+        //     .group()
+        //     .x(d3.scale.ordinal())
+        //     .xUnits(dc.units.ordinal)
+        //     .xAxisLabel('Time')
+        //     .yAxis().ticks(4);
+
+        //     dc.renderAll();
+
+        // var h = 400;
+        // var w = 400;
+        // var barPadding = 1;
+
+        // var dataset = [450, 100, 250, 50, 350];
+
+        // var dataset = [
+        //     {'time': 1, 'value': 250},
+        //     {'time': 2, 'value': 200},
+        //     {'time': 3, 'value': 150},
+        //     {'time': 4, 'value': 180}
+        // ];
+
+        // function datasetLength(obj) {
+        //     var result = 0;
+        //     for (var prop in obj) {
+        //         if (obj.hasOwnProperty(prop)) {
+        //             result++;
+        //         }
+        //     } return result;
+        // };
+
+        // console.log(datasetLength(dataset));
+
+        // var svg = d3.select('#data03')
+        //     .append('svg')
+        //     .attr('height', h)
+        //     .attr('width', w);
+        
+        // svg.selectAll('rect')
+        //     .data(dataset)
+        //     .enter()
+        //     .append('rect')
+        //     .attr('x', function(d, i) {
+        //         return i * (w / datasetLength(dataset));
+        //     })
+        //     .attr('y', function (d) {
+        //         return h - d.value;
+        //     })
+        //     .attr('height', function (d) {
+        //         return d.value;
+        //     })
+        //     .attr('width', function (d, i) {
+        //         return (w / datasetLength(dataset) - barPadding);
+        //     });
+
+        var height = 400;
+        var width = 400;
+        var barRadius = 10;
+/*
+        You'll want two scales to construct a bar chart.
+        You need one quantitative scale (typically a linear scale) to compute the bar positions along the x-axis,
+        and a second ordinal scale to compute the bar positions along the y-axis.
+
+        For the quantitative scale, you typically need to compute the domain of your data,
+        which is based on the minimum and maximum value.
+        An easy way to do that is via d3.extent:
+*/
+
+        var y = d3.scaleLinear()
+            .domain(d3.extent(tidesValue))
+            .range([0, width]);
+
+/*      You might also want to nice the scale to round the extent slightly.
+        As another example, sometimes you want the zero-value to be centered in the middle of the canvas,
+        in which case you'll want to take the greater of the minimum and maximum value:
+*/
+
+        // var y0 = Math.max(-d3.min(tidesValue), d3.max(tidesValue));
+        var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
+
+        var y = d3.scaleLinear()
+            .domain([-y0, y0])
+            .range([height, 0])
+            .nice();
+
+
+/*      For the y-axis, you'll want to use rangeRoundBands to divide the vertical space into bands for each bar.
+        This also lets you specify the amount of padding between bars.
+        Often an ordinal scale is used with some identifying data—such as a name or a unique id.
+        However, you can also use ordinal scales in conjunction with the data's index:
+*/
+
+        // var y = d3.scale.ordinal()
+        //     .domain(d3.range(tidesValue.length))
+        //     .rangeRoundBands([0, height], .2);
+
+        var x = d3.scaleBand()
+            .domain(d3.range(tidesValue.length))
+            .rangeRound([0, width])
+            .padding(.2);
+
+/*      Now that you've got your two scales, you can create the rect elements to display the bars.
+        The one tricky part is that in SVG, rects are positioned (the x and y attributes) based on their top-left corner.
+        So we need to use the x- and y-scales to compute the position of the top-left corner,
+        and that depends on whether the associated value is positive or negative: if the value is positive,
+        then the data value determines the right edge of the bar, while if it's negative,
+        it determines the left edge of the bar. Hence the conditionals here:
+*/
 
         var svg = d3.select('#data03')
             .append('svg')
-            .attr('height', h)
-            .attr('width', w);
-        
+            .attr('height', height)
+            .attr('width', width);
+
         svg.selectAll('rect')
-            .data(tidesTimeValue)
+            .data(tidesValue)
             .enter()
             .append('rect')
-            .attr('x', function(d, i) {
-                return i * (w / tidesTimeValue.length);
-            })
-            .attr('y', function (d) {
-                return h - d;
-            })
-            .attr('height', function (d) {
-                return d;
-            })
-            .attr('width', w / tidesTimeValue.length - barPadding);
+            .attr('class', 'bar')
+            .attr('y', function(d, i) { return y(Math.max(0, d)); })
+            .attr('x', function(d, i) { return x(i); })
+            .attr('height', function(d, i) { return Math.abs(y(d) - y(0)); })
+            .attr('width', x.bandwidth())
+            .attr('rx', barRadius);
+
+
+            
+        // var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
+
+        // var y = d3.scale.linear()
+        //     .domain([-y0, y0])
+        //     .range([h, 0])
+        //     .nice();
+
+        // var x = d3.scale.ordinal()
+        //     .domain(d3.range(tidesValue.length))
+        //     .rangeRoundBands([0, w], .2);
+
+        // var yAxis = d.3.svg.axis()
+        //     .scale(y)
+        //     .orient('left');
+
+        // var svg = d3.select('#data03').append("svg")
+        //     .attr('width', function (d, i) {
+        //         return (w / tidesValue.length - barPadding);
+        //     })
+        //     .attr("height", function (d) {
+        //         return d;
+        //     });
+        //     // .append("g")
+        //     // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // svg.selectAll('rect')
+        // .data(dataset)
+        // .enter()
+        // .append('rect')
+        // .attr('x', function(d, i) {
+        //     return i * (w / tidesValue.length);
+        // })
+        // .attr('y', function (d) {
+        //     return h;
+        // })
+        // .attr('height', function (d) {
+        //     return d;
+        // })
+        // .attr('width', function (d, i) {
+        //     return (w / tidesValue.length - barPadding);
+        // });
 
 
         // SOME OTHER STUFF
