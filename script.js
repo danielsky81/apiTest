@@ -389,9 +389,9 @@ xhr.onreadystatechange = function() {
             element: []
         };
 
-        for (var key in tidesTimeValue) {
+        for (var key in tidesTime) {
             var output = {};
-            output.time = tidesTimeValue[key];
+            output.time = tidesTime[key];
             output_data.element.push(output);
         }
 
