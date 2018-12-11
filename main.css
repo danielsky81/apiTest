@@ -38,3 +38,8 @@ div .col-xs-4 {
     fill: white;
     radius: 5px;
 }
+
+.line-chart
+    {
+        border: 1px solid lightgray;
+    }

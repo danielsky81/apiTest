@@ -338,6 +338,7 @@ d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2
     */
 
 
+
 var xhr = new XMLHttpRequest();
 
 xhr.open('GET', `https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID%3E=${stationId}`, true);
@@ -381,84 +382,74 @@ xhr.onreadystatechange = function() {
             return tidesTimeValue[time] = tidesValue[i];
         });
 
-        console.log(tidesTime);
-        console.log(tidesValue);
-        console.log(tidesValue.lenght);
-        console.log(tidesTimeValue);
+        // console.log(tidesTime);
+        // console.log(tidesValue);
+        // console.log(tidesTimeValue);
 
-        // var output_data = {
-        //     element: []
-        // };
+        var dataApi = [];
 
-        // for (var key in tidesTime) {
-        //     var output = {};
-        //     output.time = tidesTime[key];
-        //     output_data.element.push(output);
-        // }
+        for (i = 0; i < 250; i = i + delta) {
+            dataApi.push (
+                {
+                    date: data.table.rows[i][0],
+                    value: data.table.rows[i][2]
+                });
+        };
 
-        // console.log(output_data.element);
+        console.log(dataApi);
 
-        // var ndx = crossfilter(tidesTimeValue);
-
-        // var name_dim = ndx.dimension(dc.pluck('tidesTimeValue'));
-
-        // dc.barChart('#data03')
-        //     .width(400)
-        //     .height(400)
-        //     .dimension(name_dim)
-        //     .group()
-        //     .x(d3.scale.ordinal())
-        //     .xUnits(dc.units.ordinal)
-        //     .xAxisLabel('Time')
-        //     .yAxis().ticks(4);
-
-        //     dc.renderAll();
-
-        // var h = 400;
-        // var w = 400;
-        // var barPadding = 1;
-
-        // var dataset = [450, 100, 250, 50, 350];
-
-        // var dataset = [
-        //     {'time': 1, 'value': 250},
-        //     {'time': 2, 'value': 200},
-        //     {'time': 3, 'value': 150},
-        //     {'time': 4, 'value': 180}
-        // ];
-
-        // function datasetLength(obj) {
-        //     var result = 0;
-        //     for (var prop in obj) {
-        //         if (obj.hasOwnProperty(prop)) {
-        //             result++;
-        //         }
-        //     } return result;
-        // };
-
-        // console.log(datasetLength(dataset));
-
-        // var svg = d3.select('#data03')
-        //     .append('svg')
-        //     .attr('height', h)
-        //     .attr('width', w);
         
-        // svg.selectAll('rect')
-        //     .data(dataset)
-        //     .enter()
-        //     .append('rect')
-        //     .attr('x', function(d, i) {
-        //         return i * (w / datasetLength(dataset));
-        //     })
-        //     .attr('y', function (d) {
-        //         return h - d.value;
-        //     })
-        //     .attr('height', function (d) {
-        //         return d.value;
-        //     })
-        //     .attr('width', function (d, i) {
-        //         return (w / datasetLength(dataset) - barPadding);
-        //     });
+        var svgWidth = 600
+        var svgHeight = 300;
+        var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+        var width = svgWidth - margin.left - margin.right;
+        var height = svgHeight - margin.top - margin.bottom;
+        var svg = d3.select('#data02')
+            .attr('width', svgWidth)
+            .attr('height', svgHeight);
+
+        var g = svg.append('g')
+        .attr('transform', 
+            'translate(' + margin.left + ',' + margin.top + ')'
+        );
+
+        var x = d3.scaleTime().rangeRound([0, width]);
+        var y = d3.scaleLinear().rangeRound([height, 0]);
+
+        var line = d3.line()
+            .x(function(d) { return x(d.date)})
+            .y(function(d) { return y(d.value)})
+
+        x.domain(d3.extent(dataApi, function(d) { return d.date }));
+
+        y.domain(d3.extent(dataApi, function(d) { return d.value }));
+
+        g.append('g')
+            .attr('transform', 'translate(0,' + height + ')')
+            .call(d3.axisBottom(x))
+            .select('.domain')
+            .remove();        
+
+        g.append('g')
+            .call(d3.axisLeft(y))
+            .append('text')
+            .attr('fill', '#000')
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 6)
+            .attr('dy', '0.71em')
+            .attr('text-anchor', 'end')
+            .text('Price ($)');
+
+        g.append('path')
+            .datum(dataApi)
+            .attr('fill', 'one')
+            .attr('stroke', 'white')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', 1.5)
+            .attr('d', line);
+
+
 
         var height = 400;
         var width = 400;
@@ -482,7 +473,6 @@ xhr.onreadystatechange = function() {
         in which case you'll want to take the greater of the minimum and maximum value:
 */
 
-        // var y0 = Math.max(-d3.min(tidesValue), d3.max(tidesValue));
         var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
 
         var y = d3.scaleLinear()
@@ -496,10 +486,6 @@ xhr.onreadystatechange = function() {
         Often an ordinal scale is used with some identifying data—such as a name or a unique id.
         However, you can also use ordinal scales in conjunction with the data's index:
 */
-
-        // var y = d3.scale.ordinal()
-        //     .domain(d3.range(tidesValue.length))
-        //     .rangeRoundBands([0, height], .2);
 
         var x = d3.scaleBand()
             .domain(d3.range(tidesValue.length))
@@ -529,85 +515,10 @@ xhr.onreadystatechange = function() {
             .attr('height', function(d, i) { return Math.abs(y(d) - y(0)); })
             .attr('width', x.bandwidth())
             .attr('rx', barRadius);
+  
+//  Line Chart Test
 
 
-            
-        // var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
-
-        // var y = d3.scale.linear()
-        //     .domain([-y0, y0])
-        //     .range([h, 0])
-        //     .nice();
-
-        // var x = d3.scale.ordinal()
-        //     .domain(d3.range(tidesValue.length))
-        //     .rangeRoundBands([0, w], .2);
-
-        // var yAxis = d.3.svg.axis()
-        //     .scale(y)
-        //     .orient('left');
-
-        // var svg = d3.select('#data03').append("svg")
-        //     .attr('width', function (d, i) {
-        //         return (w / tidesValue.length - barPadding);
-        //     })
-        //     .attr("height", function (d) {
-        //         return d;
-        //     });
-        //     // .append("g")
-        //     // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // svg.selectAll('rect')
-        // .data(dataset)
-        // .enter()
-        // .append('rect')
-        // .attr('x', function(d, i) {
-        //     return i * (w / tidesValue.length);
-        // })
-        // .attr('y', function (d) {
-        //     return h;
-        // })
-        // .attr('height', function (d) {
-        //     return d;
-        // })
-        // .attr('width', function (d, i) {
-        //     return (w / tidesValue.length - barPadding);
-        // });
-
-
-        // SOME OTHER STUFF
-
-        // var a = function timeJson (i) {
-        //     return tidePrediction.table.rows[i][0];
-        // };
-
-        // var b = function tideJson (i) {
-        //     return tidePrediction.table.rows[i][2]
-        // };
-
-        // console.log(a(0));
-        // console.log(b(10));
-
-        // var dataset = [{
-        //     '${a(0)}': '${b(0)}'
-        // },{
-        //     '${a(10)}': '${b(10)}'
-        // }];
-
-        // console.log(dataset);
-
-        // var time = tidePrediction.rows
-        // var output = '';
-
-        // output += '<div>' +
-        //     '<ul>' +
-        //         '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
-        //         '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
-        //         '<br>' +
-        //         '<li>Weather: '+openWeather.weather[0].main+'</li>' +
-        //     '</ul>'
-
-        //     document.getElementById('data03').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data03').innerHTML = 'Data request exceeded! Please come back tomorrow';
