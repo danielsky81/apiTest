@@ -398,56 +398,153 @@ xhr.onreadystatechange = function() {
 
         console.log(dataApi);
 
+        // var dataApi = [{
+        //     date: 1, value: -0.89
+        // },{
+        //     date: 2, value: -0.35
+        // },{
+        //     date: 3, value: 0.09
+        // },{
+        //     date: 4, value: 0.89
+        // },{
+        //     date: 5, value: 1.19
+        // },{
+        //     date: 6, value: 0.19
+        // },{
+        //     date: 7, value: -0.21
+        // },{
+        //     date: 8, value: -0.52
+        // }]
+
         
-        var svgWidth = 600
-        var svgHeight = 300;
-        var margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        var width = svgWidth - margin.left - margin.right;
-        var height = svgHeight - margin.top - margin.bottom;
-        var svg = d3.select('#data02')
-            .attr('width', svgWidth)
-            .attr('height', svgHeight);
+        // var svgWidth = 600
+        // var svgHeight = 300;
+        // var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+        // var width = svgWidth - margin.left - margin.right;
+        // var height = svgHeight - margin.top - margin.bottom;
+        // var svg = d3.select('#data02')
+        //     .attr('width', svgWidth)
+        //     .attr('height', svgHeight);
 
-        var g = svg.append('g')
-        .attr('transform', 
-            'translate(' + margin.left + ',' + margin.top + ')'
-        );
+        // var g = svg.append('g')
+        // .attr('transform', 
+        //     'translate(' + margin.left + ',' + margin.top + ')'
+        // );
 
-        var x = d3.scaleTime().rangeRound([0, width]);
-        var y = d3.scaleLinear().rangeRound([height, 0]);
+        // var x = d3.scaleTime([0, width]);
 
-        var line = d3.line()
-            .x(function(d) { return x(d.date)})
-            .y(function(d) { return y(d.value)})
+        // // console.log(x.ticks(24));
 
-        x.domain(d3.extent(dataApi, function(d) { return d.date }));
+        // var y = d3.scaleLinear([height, 0]);
 
-        y.domain(d3.extent(dataApi, function(d) { return d.value }));
+        // var line = d3.line()
+        //     .x(function(d) { return x(d.date)})
+        //     .y(function(d) { return y(d.value)})
 
-        g.append('g')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(d3.axisBottom(x))
-            .select('.domain')
-            .remove();        
+        // x.domain(d3.extent(dataApi, function(d) { return d.date }));
 
-        g.append('g')
-            .call(d3.axisLeft(y))
-            .append('text')
-            .attr('fill', '#000')
-            .attr('transform', 'rotate(-90)')
-            .attr('y', 6)
-            .attr('dy', '0.71em')
-            .attr('text-anchor', 'end')
-            .text('Price ($)');
+        // y.domain(d3.extent(dataApi, function(d) { return d.value }));
 
-        g.append('path')
-            .datum(dataApi)
-            .attr('fill', 'one')
-            .attr('stroke', 'white')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-linecap', 'round')
-            .attr('stroke-width', 1.5)
-            .attr('d', line);
+        // g.append('g')
+        //     .attr('transform', 'translate(0,' + height + ')')
+        //     .call(d3.axisBottom(x))
+        //     .select('.domain')
+        //     .remove();        
+
+        // g.append('g')
+        //     .call(d3.axisLeft(y))
+        //     .append('text')
+        //     .attr('fill', '#000')
+        //     .attr('transform', 'rotate(-90)')
+        //     .attr('y', 6)
+        //     .attr('dy', '0.71em')
+        //     .attr('text-anchor', 'end')
+        //     .text('Price ($)');
+
+        // g.append('path')
+        //     .datum(dataApi)
+        //     .attr('fill', 'one')
+        //     .attr('stroke', 'white')
+        //     .attr('stroke-linejoin', 'round')
+        //     .attr('stroke-linecap', 'round')
+        //     .attr('stroke-width', 1.5)
+        //     .attr('d', line);
+
+
+
+		/* implementation heavily influenced by http://bl.ocks.org/1166403 */
+		
+		// define dimensions of graph
+		var m = [10, 10, 10, 10]; // margins
+		var w = 400 - m[1] - m[3]; // width
+		var h = 400 - m[0] - m[2]; // height
+		
+		// create a simple data array that we'll plot with a line (this array represents only the Y values, X will just be the index location)
+        var data = [-3, -6, -2, 0, 5, 2, 0, -3, -8, -9, -2, 5, 9, 13];
+        var data = tidesValue;
+
+		// X scale will fit all values from data[] within pixels 0-w
+		var x = d3.scaleLinear().domain([0, data.length]).range([0, w]);
+		// Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
+		var y = d3.scaleLinear().domain([-3, 3]).range([h, 0]);
+			// automatically determining max range can work something like this
+			// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
+
+		// create a line function that can convert data[] into x and y points
+		var line = d3.line()
+			// assign the X function to plot our line as we wish
+			.x(function(d,i) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				// return the X coordinate where we want to plot this datapoint
+				return x(i); 
+			})
+			.y(function(d) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+				// return the Y coordinate where we want to plot this datapoint
+				return y(d); 
+            })
+            .curve(d3.curveBasis)
+
+			// Add an SVG element with the desired dimensions and margin.
+			var graph = d3.select("#data02").append("svg:svg")
+			      .attr("width", w + m[1] + m[3])
+			      .attr("height", h + m[0] + m[2])
+			    .append("svg:g")
+			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+			// create yAxis
+			var xAxis = d3.axisBottom().scale(x).tickSize(-h);
+			// Add the x-axis.
+			graph.append("svg:g")
+			      .attr("class", "x axis")
+			      .attr("transform", "translate(0," + h + ")")
+			      .call(xAxis);
+
+
+			// // create left yAxis
+			// var yAxisLeft = d3.axisLeft().scale(y);
+			// // Add the y-axis to the left
+			// graph.append("svg:g")
+			//       .attr("class", "y axis")
+			//       .attr("transform", "translate(-25,0)")
+			//       .call(yAxisLeft);
+			
+  			// Add the line by appending an svg:path element with the data line we created above
+			// do this AFTER the axes above so that the line is above the tick-lines
+  			graph.append("svg:path").attr("d", line(data));
+
+
+
+
+
+
+
+
+
+
+
 
 
 
