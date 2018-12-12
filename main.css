@@ -39,10 +39,10 @@ div .col-xs-4 {
     radius: 5px;
 }
 
-.line-chart
+/* .line-chart
     {
         border: 1px solid lightgray;
-    }
+    } */
 
     path {
         stroke: white;
@@ -52,16 +52,18 @@ div .col-xs-4 {
     
     .axis {
       shape-rendering: crispEdges;
+      color: black;
     }
 
     .x.axis line, .y.axis line {
-      stroke: lightgrey;
-    }
-
-    .x.axis .minor, .y.axis .minor {
-      stroke-opacity: .2;
+      stroke: white;
+      opacity: 0.1;
     }
 
     .x.axis path, .y.axis path {
       display: none;
+    }
+
+    #data02 svg g {
+        font-size: 250;
     }

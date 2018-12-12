@@ -280,64 +280,6 @@ xhr.send();
 var timeFrom = '2018-11-30T00%3A00%3A00Z';
 var timeTo = '2018-12-01T00%3A00%3A00Z';
 var stationId = '%22Dublin_Port%22';
-/*
-d3.json(`https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=${timeFrom}&time%3C=${timeTo}&stationID=${stationId}`)
-    .then( function(data) {
-        console.log(data);
-
-        var tidePrediction = data.table.rows[0][2];
-        console.log(tidePrediction);
-
-        var tidesTime = [];
-        var tidesValue = [];
-        var tidesTimeValue = {};
-
-        var delta = 10;
-        console.log(data.table.rows.length);
-        console.log(delta);
-
-        for (i = 0; i < data.table.rows.length; i = i + delta) {
-            tidesTime.push(data.table.rows[i][0]);
-        }
-
-        for (i = 0; i < data.table.rows.length; i = i + delta) {
-            tidesValue.push(data.table.rows[i][2]);
-        }
-
-        tidesTime.forEach(function (time, i) {
-            return tidesTimeValue[time] = tidesValue[i];
-        });
-
-        console.log(tidesTimeValue);
-
-        var h = 400;
-        var w = 400;
-        var barPadding = 1;
-
-        var svg = d3.select('#data03')
-            .append('svg')
-            .attr('height', h)
-            .attr('width', w);
-        
-        svg.selectAll('rect')
-            .data(tidesTimeValue)
-            .enter()
-            .append('rect')
-            .attr('x', function(d, i) {
-                return i * (w / tidesTimeValue.length);
-            })
-            .attr('y', function (d) {
-                return h - d;
-            })
-            .attr('height', function (d) {
-                return d;
-            })
-            .attr('width', w / tidesTimeValue.length - barPadding);
-
-    }); 
-    */
-
-
 
 var xhr = new XMLHttpRequest();
 
@@ -382,11 +324,19 @@ xhr.onreadystatechange = function() {
             return tidesTimeValue[time] = tidesValue[i];
         });
 
-        console.log(tidesTime[0]);
+        console.log(tidesTime[10]);
 
-        console.log(tidesTime.getUTCHours());
+        // UTC time to Hour and Minutes
 
-        // console.log(tidesValue);
+        var time = new Date(tidesTime[10]);
+        var timeHM = time.getUTCHours() + ':' + time.getUTCMinutes();
+
+        console.log(timeHM);
+       
+        console.log(tidesValue);
+
+        // the tidesValue index reflect the time as well since the first element (i.e index 0) equal the midnight 00:00
+
         // console.log(tidesTimeValue);
 
         var dataApi = [];
@@ -394,93 +344,24 @@ xhr.onreadystatechange = function() {
         for (i = 0; i < 240; i = i + delta) {
             dataApi.push (
                 {
-                    date: data.table.rows[i][0],
+                    // date: data.table.rows[i][0],
+                    date: (new Date(data.table.rows[i][0])).getUTCHours(),
                     value: data.table.rows[i][2]
                 });
         };
 
-        // console.log(dataApi);
+        console.log(dataApi);
 
-        // var dataApi = [{
-        //     date: 1, value: -0.89
-        // },{
-        //     date: 2, value: -0.35
-        // },{
-        //     date: 3, value: 0.09
-        // },{
-        //     date: 4, value: 0.89
-        // },{
-        //     date: 5, value: 1.19
-        // },{
-        //     date: 6, value: 0.19
-        // },{
-        //     date: 7, value: -0.21
-        // },{
-        //     date: 8, value: -0.52
-        // }]
 
-        
-        // var svgWidth = 600
-        // var svgHeight = 300;
-        // var margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        // var width = svgWidth - margin.left - margin.right;
-        // var height = svgHeight - margin.top - margin.bottom;
-        // var svg = d3.select('#data02')
-        //     .attr('width', svgWidth)
-        //     .attr('height', svgHeight);
-
-        // var g = svg.append('g')
-        // .attr('transform', 
-        //     'translate(' + margin.left + ',' + margin.top + ')'
-        // );
-
-        // var x = d3.scaleTime([0, width]);
-
-        // // console.log(x.ticks(24));
-
-        // var y = d3.scaleLinear([height, 0]);
-
-        // var line = d3.line()
-        //     .x(function(d) { return x(d.date)})
-        //     .y(function(d) { return y(d.value)})
-
-        // x.domain(d3.extent(dataApi, function(d) { return d.date }));
-
-        // y.domain(d3.extent(dataApi, function(d) { return d.value }));
-
-        // g.append('g')
-        //     .attr('transform', 'translate(0,' + height + ')')
-        //     .call(d3.axisBottom(x))
-        //     .select('.domain')
-        //     .remove();        
-
-        // g.append('g')
-        //     .call(d3.axisLeft(y))
-        //     .append('text')
-        //     .attr('fill', '#000')
-        //     .attr('transform', 'rotate(-90)')
-        //     .attr('y', 6)
-        //     .attr('dy', '0.71em')
-        //     .attr('text-anchor', 'end')
-        //     .text('Price ($)');
-
-        // g.append('path')
-        //     .datum(dataApi)
-        //     .attr('fill', 'one')
-        //     .attr('stroke', 'white')
-        //     .attr('stroke-linejoin', 'round')
-        //     .attr('stroke-linecap', 'round')
-        //     .attr('stroke-width', 1.5)
-        //     .attr('d', line);
-
+// LINE CHART
 
 
 		/* implementation heavily influenced by http://bl.ocks.org/1166403 */
 		
 		// define dimensions of graph
 		var m = [10, 10, 10, 10]; // margins
-		var w = 450 - m[1] - m[3]; // width
-		var h = 200 - m[0] - m[2]; // height
+		var w = 350 - m[1] - m[3]; // width
+		var h = 150 - m[0] - m[2]; // height
 		
 		// create a simple data array that we'll plot with a line (this array represents only the Y values, X will just be the index location)
         // var data = [-3, -6, -2, 0, 5, 2, 0, -3, -8, -9, -2, 5, 9, 13];
@@ -518,7 +399,7 @@ xhr.onreadystatechange = function() {
 			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 			// create yAxis
-			var xAxis = d3.axisBottom().scale(x).ticks(7).tickSize(-h);
+			var xAxis = d3.axisBottom().scale(x).ticks(4).tickSize(-h);
 			// Add the x-axis.
 			graph.append("svg:g")
 			      .attr("class", "x axis")
@@ -543,19 +424,11 @@ xhr.onreadystatechange = function() {
                 .attr("y1",y(0))//so that the line passes through the y 0
                 .attr("x2",w)
                 .attr("y2",y(0))//so that the line passes through the y 0
-                .style("stroke", "black");
+                .style("stroke", "black")
+                .style("opacity", ".5");
 
 
-
-
-
-
-
-
-
-
-
-
+// BAR CHART
 
         var height = 400;
         var width = 400;
@@ -621,10 +494,87 @@ xhr.onreadystatechange = function() {
             .attr('height', function(d, i) { return Math.abs(y(d) - y(0)); })
             .attr('width', x.bandwidth())
             .attr('rx', barRadius);
-  
-//  Line Chart Test
 
+// LINE CHART NO.2
 
+var margin = [20, 20, 30, 50]; // margins
+var width = 600 - margin[1] - margin[3]; // width
+var height = 400 - margin[0] - margin[2]; // height
+
+// parse data from json
+// var parseDate = d3.timeParse("%B %d, %Y");
+
+var parseDate = d3.timeFormat("%I %p")
+
+console.log(parseDate);
+
+// set scales
+// var x = d3.scaleTime()
+//     .range([0, width]);
+
+var x = d3.scaleLinear()
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+// create axes
+
+// var xAxis = d3.svg.axis()
+//     .scale(x)
+//     .orient("bottom");
+// REPLACED BY:
+
+var xAxis = d3.axisBottom(x);
+
+// var yAxis = d3.svg.axis()
+//     .scale(u) 
+//     .orient("left");
+// REPLACED BY:
+
+var yAxis = d3.axisLeft(y);
+
+// construct line using points from data
+
+var line = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); })
+    .curve(d3.curveBasis);
+
+var svg = d3.select("#data04")
+    .append("svg")
+    .attr("width", width + margin[3] + margin[1])
+    .attr("height", height + margin[0] + margin[2])
+    .append("g")
+    .attr("transform", "translate(" + margin[3] + "," + margin[0] + ")");
+
+var data = dataApi;
+
+// establish domain for x and y
+
+x.domain(d3.extent(data, function(d) { return d.date; }));
+y.domain(d3.extent(data, function(d) { return d.value; }));
+
+// append grouops
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("dy", 6)
+    .style("text-anchor", "end")
+    .text("Tide Heights & Lows");
+
+svg.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line);
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data03').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -636,30 +586,3 @@ xhr.onerror = function() {
 };
 
 xhr.send();
-
-
-// var h = 100;
-// var w = 500;
-// var ds; // global var for dataset
-
-// var timeFrom = '2018-11-26T00%3A00%3A00Z';
-// var timeTo = '2018-11-29T00%3A00%3A00Z';
-// var stationId = '%22Dublin%20Port%22';
-
-// d3.json('https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.json?time%2CstationID%2CWater_Level_ODM&time%3E=2018-11-26T00%3A00%3A00Z&time%3C=2018-11-29T00%3A00%3A00Z&stationID%3E=%22Dublin%20Port%22', function (error, data) {
-//     if (error) {
-//         console.log(error);
-//     } else {
-//         console.log(data);
-//     }
-
-//     var decodedData = JSON.parse(data.table);
-
-//     console.log(decodedData.table);
-
-// });
-
-// d3.select('#data03')
-//     .append('h1')
-//     .text('Test chart');
-
