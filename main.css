@@ -46,7 +46,7 @@ div .col-xs-4 {
 
     path {
         stroke: white;
-        stroke-width: 1;
+        stroke-width: 2;
         fill: none;
     }
     
@@ -54,19 +54,14 @@ div .col-xs-4 {
       shape-rendering: crispEdges;
     }
 
-    .x.axis line {
+    .x.axis line, .y.axis line {
       stroke: lightgrey;
     }
 
-    .x.axis .minor {
-      stroke-opacity: .5;
+    .x.axis .minor, .y.axis .minor {
+      stroke-opacity: .2;
     }
 
-    .x.axis path {
+    .x.axis path, .y.axis path {
       display: none;
-    }
-
-    .y.axis line, .y.axis path {
-      fill: none;
-      stroke: #000;
     }

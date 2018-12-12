@@ -346,7 +346,7 @@ xhr.open('GET', `https://erddap.marine.ie/erddap/tabledap/IMI-TidePrediction.jso
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var data = JSON.parse(this.responseText);
-        console.log(data);
+        // console.log(data);
         // console.log(data.table.rows[0][2] + ' + ' + data.table.rows[10][2]);
 
         // D3.js DATA
@@ -366,7 +366,7 @@ xhr.onreadystatechange = function() {
         //     tidesTime.push(data.table.rows[i][0]);
         // }
 
-        for (i = 0; i < 250; i = i + delta) {
+        for (i = 0; i < 240; i = i + delta) {
             tidesTime.push(data.table.rows[i][0]);
         }
 
@@ -374,7 +374,7 @@ xhr.onreadystatechange = function() {
         //     tidesValue.push(data.table.rows[i][2]);
         // }
 
-        for (i = 0; i < 250; i = i + delta) {
+        for (i = 0; i < 240; i = i + delta) {
             tidesValue.push(data.table.rows[i][2]);
         }
 
@@ -382,13 +382,16 @@ xhr.onreadystatechange = function() {
             return tidesTimeValue[time] = tidesValue[i];
         });
 
-        // console.log(tidesTime);
+        console.log(tidesTime[0]);
+
+        console.log(tidesTime.getUTCHours());
+
         // console.log(tidesValue);
         // console.log(tidesTimeValue);
 
         var dataApi = [];
 
-        for (i = 0; i < 250; i = i + delta) {
+        for (i = 0; i < 240; i = i + delta) {
             dataApi.push (
                 {
                     date: data.table.rows[i][0],
@@ -396,7 +399,7 @@ xhr.onreadystatechange = function() {
                 });
         };
 
-        console.log(dataApi);
+        // console.log(dataApi);
 
         // var dataApi = [{
         //     date: 1, value: -0.89
@@ -476,17 +479,17 @@ xhr.onreadystatechange = function() {
 		
 		// define dimensions of graph
 		var m = [10, 10, 10, 10]; // margins
-		var w = 400 - m[1] - m[3]; // width
-		var h = 400 - m[0] - m[2]; // height
+		var w = 450 - m[1] - m[3]; // width
+		var h = 200 - m[0] - m[2]; // height
 		
 		// create a simple data array that we'll plot with a line (this array represents only the Y values, X will just be the index location)
-        var data = [-3, -6, -2, 0, 5, 2, 0, -3, -8, -9, -2, 5, 9, 13];
+        // var data = [-3, -6, -2, 0, 5, 2, 0, -3, -8, -9, -2, 5, 9, 13];
         var data = tidesValue;
 
 		// X scale will fit all values from data[] within pixels 0-w
-		var x = d3.scaleLinear().domain([0, data.length]).range([0, w]);
+		var x = d3.scaleLinear().domain([0, tidesValue.length]).range([0, w]);
 		// Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
-		var y = d3.scaleLinear().domain([-3, 3]).range([h, 0]);
+		var y = d3.scaleLinear().domain([d3.min(tidesValue), d3.max(tidesValue)]).range([h, 0]);
 			// automatically determining max range can work something like this
 			// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
 
@@ -495,13 +498,13 @@ xhr.onreadystatechange = function() {
 			// assign the X function to plot our line as we wish
 			.x(function(d,i) { 
 				// verbose logging to show what's actually being done
-				console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				// console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
 				// return the X coordinate where we want to plot this datapoint
 				return x(i); 
 			})
 			.y(function(d) { 
 				// verbose logging to show what's actually being done
-				console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+				// console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
 				// return the Y coordinate where we want to plot this datapoint
 				return y(d); 
             })
@@ -515,7 +518,7 @@ xhr.onreadystatechange = function() {
 			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 			// create yAxis
-			var xAxis = d3.axisBottom().scale(x).tickSize(-h);
+			var xAxis = d3.axisBottom().scale(x).ticks(7).tickSize(-h);
 			// Add the x-axis.
 			graph.append("svg:g")
 			      .attr("class", "x axis")
@@ -528,13 +531,19 @@ xhr.onreadystatechange = function() {
 			// // Add the y-axis to the left
 			// graph.append("svg:g")
 			//       .attr("class", "y axis")
-			//       .attr("transform", "translate(-25,0)")
+			//       .attr("transform", "translate(-10,0)")
 			//       .call(yAxisLeft);
 			
   			// Add the line by appending an svg:path element with the data line we created above
 			// do this AFTER the axes above so that the line is above the tick-lines
   			graph.append("svg:path").attr("d", line(data));
 
+              graph.append("line")
+              //   .attr("x1",-6)
+                .attr("y1",y(0))//so that the line passes through the y 0
+                .attr("x2",w)
+                .attr("y2",y(0))//so that the line passes through the y 0
+                .style("stroke", "black");
 
 
 
