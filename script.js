@@ -128,8 +128,14 @@ function initMap() {
     }
 }
 
+// To be used with OpenWeatherMap API and Stormglass API
+
 const lat = surfSpots[19].location['lat'];
 const lng = surfSpots[19].location['lng'];
+
+var surfSpot = surfSpots[19];
+
+console.log(surfSpots[19]);
 
 // ****************************************************************** OpenWeatherMap API
 
@@ -165,6 +171,8 @@ xhr.onreadystatechange = function() {
 
         output += '<div>' +
             '<ul>' +
+                '<li>Surf Spot: '+surfSpot.title+'</li>' +       
+                '<br>' +
                 '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
                 '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
                 '<br>' +
@@ -197,12 +205,29 @@ xhr.onreadystatechange = function() {
 
     if (this.readyState == 4 && this.status == 200) {
         var weather = JSON.parse(this.responseText);
-        // console.log(weather);
+        console.log(weather);
+
+        // DATA
 
         var output = '';
 
+        // getting an average values for data values with several sources
+            // maybe stick to the first source i.e. SG as it is the most frequent and first in all data
+
+        var total = 0;
+        var length = 0;
+
+        for (var v in weather.hours[12].airTemperature) {
+            total += weather.hours[12].airTemperature[v].value;
+            length++;
+        };
+
+        var averageAirTemp = total / length;
+
+        console.log(averageAirTemp);
+
         var time = weather.hours[12].time;
-        var airTemperature = Math.round(weather.hours[12].airTemperature[0].value);
+        var airTemperature = Math.round(averageAirTemp);
         var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
         var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
         var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
@@ -239,13 +264,12 @@ xhr.onreadystatechange = function() {
             }
         };
 
-
         output += '<div>' +
             '<ul>' +
                 '<li>Today is: '+timeNow+'</li>'+
-                '<li>Surf Spot: '+surfSpots[19].title+'</li>' +
+                '<li>Surf Spot: '+surfSpot.title+'</li>' +
                 '<br>' +
-                '<li>Date & Time: '+time+'</li>' +
+                '<li>Date & Time of the Forecast: '+time+'</li>' +
                 '<br>' +
                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
@@ -253,7 +277,7 @@ xhr.onreadystatechange = function() {
                 '<li>Wave Height: '+waveHeight+' m</li>' +
                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
                 '<br>' +
-                '<li>Surf Spot pointing: '+surfSpots[19].point+'</li>' +
+                '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
                 '<br>' +
@@ -262,7 +286,6 @@ xhr.onreadystatechange = function() {
 
             document.getElementById('data02').innerHTML = output;
 
-            console.log(weather);
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
