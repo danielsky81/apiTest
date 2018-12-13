@@ -142,7 +142,7 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        // console.log(openWeather);
+        console.log(openWeather);
 
         var output = '';
 
@@ -185,7 +185,7 @@ xhr.onerror = function() {
 xhr.send();
 
 // ****************************************************************** Stormglass API
-/*
+
 const params = 'airTemperature,waterTemperature,waveHeight,wavePeriod,swellDirection,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
@@ -274,11 +274,11 @@ xhr.onerror = function() {
 };
 
 xhr.send();
-*/
+
 // ****************************************************************** Marine Institute of Ireland data
 
-var timeFrom = '2018-11-30T00%3A00%3A00Z';
-var timeTo = '2018-12-01T00%3A00%3A00Z';
+var timeFrom = '2018-12-10T00%3A00%3A00Z';
+var timeTo = '2018-12-11T00%3A00%3A00Z';
 var stationId = '%22Dublin_Port%22';
 
 var xhr = new XMLHttpRequest();
@@ -392,7 +392,7 @@ xhr.onreadystatechange = function() {
             .curve(d3.curveBasis)
 
 			// Add an SVG element with the desired dimensions and margin.
-			var graph = d3.select("#data02").append("svg:svg")
+			var graph = d3.select("#data03").append("svg:svg")
 			      .attr("width", w + m[1] + m[3])
 			      .attr("height", h + m[0] + m[2])
 			    .append("svg:g")
@@ -430,9 +430,9 @@ xhr.onreadystatechange = function() {
 
 // BAR CHART
 
-        var height = 400;
-        var width = 400;
-        var barRadius = 10;
+        // var height = 400;
+        // var width = 400;
+        // var barRadius = 10;
 /*
         You'll want two scales to construct a bar chart.
         You need one quantitative scale (typically a linear scale) to compute the bar positions along the x-axis,
@@ -443,21 +443,21 @@ xhr.onreadystatechange = function() {
         An easy way to do that is via d3.extent:
 */
 
-        var y = d3.scaleLinear()
-            .domain(d3.extent(tidesValue))
-            .range([0, width]);
+        // var y = d3.scaleLinear()
+        //     .domain(d3.extent(tidesValue))
+        //     .range([0, width]);
 
 /*      You might also want to nice the scale to round the extent slightly.
         As another example, sometimes you want the zero-value to be centered in the middle of the canvas,
         in which case you'll want to take the greater of the minimum and maximum value:
 */
 
-        var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
+        // var y0 = Math.max(Math.abs(d3.min(tidesValue)), Math.abs(d3.max(tidesValue)));
 
-        var y = d3.scaleLinear()
-            .domain([-y0, y0])
-            .range([height, 0])
-            .nice();
+        // var y = d3.scaleLinear()
+        //     .domain([-y0, y0])
+        //     .range([height, 0])
+        //     .nice();
 
 
 /*      For the y-axis, you'll want to use rangeRoundBands to divide the vertical space into bands for each bar.
@@ -466,10 +466,10 @@ xhr.onreadystatechange = function() {
         However, you can also use ordinal scales in conjunction with the data's index:
 */
 
-        var x = d3.scaleBand()
-            .domain(d3.range(tidesValue.length))
-            .rangeRound([0, width])
-            .padding(.2);
+        // var x = d3.scaleBand()
+        //     .domain(d3.range(tidesValue.length))
+        //     .rangeRound([0, width])
+        //     .padding(.2);
 
 /*      Now that you've got your two scales, you can create the rect elements to display the bars.
         The one tricky part is that in SVG, rects are positioned (the x and y attributes) based on their top-left corner.
@@ -479,21 +479,23 @@ xhr.onreadystatechange = function() {
         it determines the left edge of the bar. Hence the conditionals here:
 */
 
-        var svg = d3.select('#data03')
-            .append('svg')
-            .attr('height', height)
-            .attr('width', width);
+        // var svg = d3.select('#data03')
+        //     .append('svg')
+        //     .attr('height', height)
+        //     .attr('width', width);
 
-        svg.selectAll('rect')
-            .data(tidesValue)
-            .enter()
-            .append('rect')
-            .attr('class', 'bar')
-            .attr('y', function(d, i) { return y(Math.max(0, d)); })
-            .attr('x', function(d, i) { return x(i); })
-            .attr('height', function(d, i) { return Math.abs(y(d) - y(0)); })
-            .attr('width', x.bandwidth())
-            .attr('rx', barRadius);
+        // svg.selectAll('rect')
+        //     .data(tidesValue)
+        //     .enter()
+        //     .append('rect')
+        //     .attr('class', 'bar')
+        //     .attr('y', function(d, i) { return y(Math.max(0, d)); })
+        //     .attr('x', function(d, i) { return x(i); })
+        //     .attr('height', function(d, i) { return Math.abs(y(d) - y(0)); })
+        //     .attr('width', x.bandwidth())
+        //    .attr('rx', barRadius);
+
+/*
 
 // LINE CHART NO.2
 
@@ -576,10 +578,14 @@ svg.append("path")
     .attr("class", "line")
     .attr("d", line);
 
+*/
+
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data03').innerHTML = 'Data request exceeded! Please come back tomorrow';
     }  
 };
+
+
 
 xhr.onerror = function() {
     console.log('Request error');
