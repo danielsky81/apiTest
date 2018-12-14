@@ -13,12 +13,12 @@ var surfSpots = [
     {title: 'Inch Strand, Co. Kerry', location: {lat: 52.128852, lng: -9.955673}},
     {title: 'Barley Cove, Co. Cork', location: {lat: 51.469675, lng: -9.775343}},
     {title: 'Inchydoney, Co. Cork', location: {lat: 51.597281, lng: -8.861418}},
-    {title: 'Castlefreake, Co. Cork', location: {lat: 51.557116, lng: -8.966045}, point: 'Southwest'},
+    {title: 'Castlefreake, Co. Cork', location: {lat: 51.557116, lng: -8.966045}, point: 225},
     {title: 'Garretstown, Co. Cork', location: {lat: 51.640394, lng: -8.564358}},
     {title: 'Tramore, Co. Waterford', location: {lat: 52.153083, lng: -7.107811}},
     {title: 'Portrush, Co. Antrim', location: {lat: 55.170241, lng: -6.731873}},
     {title: 'Magheramore, Co. Wicklow', location: {lat: 52.930841, lng: -6.023053}},
-    {title: 'Whiterock, County Dublin', location: {lat: 53.265934, lng: -6.106232}, point: 'Southeast'}
+    {title: 'Whiterock, County Dublin', location: {lat: 53.265934, lng: -6.106232}, point: 135}
 ] 
 
 // ****************************************************************** Google Maps API
@@ -135,7 +135,7 @@ const lng = surfSpots[19].location['lng'];
 
 var surfSpot = surfSpots[19];
 
-console.log(surfSpots[19]);
+// console.log(surfSpots[19]);
 
 // ****************************************************************** OpenWeatherMap API
 
@@ -148,7 +148,7 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        console.log(openWeather);
+        // console.log(openWeather);
 
         var output = '';
 
@@ -205,14 +205,15 @@ xhr.onreadystatechange = function() {
 
     if (this.readyState == 4 && this.status == 200) {
         var weather = JSON.parse(this.responseText);
+        console.log('Stormglass API JSON data:');
         console.log(weather);
 
         // DATA
 
         var output = '';
 
-        // getting an average values for data values with several sources
-            // maybe stick to the first source i.e. SG as it is the most frequent and first in all data
+// getting an average values for data values with several sources
+// maybe stick to the first source i.e. SG as it is the most frequent and first in all data
 
         var total = 0;
         var length = 0;
@@ -224,7 +225,9 @@ xhr.onreadystatechange = function() {
 
         var averageAirTemp = total / length;
 
-        console.log(averageAirTemp);
+        console.log('Average Air Temperature: ' +averageAirTemp);
+
+// Data break down into types and values:
 
         var time = weather.hours[12].time;
         var airTemperature = Math.round(averageAirTemp);
@@ -237,32 +240,106 @@ xhr.onreadystatechange = function() {
 
         var timeNow = new Date();
 
-        console.log(timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
+        console.log('Todays date and time: ' + timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
 
-        // Display time for tidal & temperature information
+// Display time for tidal & temperature information
 
         var timeHour = ('0' + timeNow.getHours()).slice(-2);
         var timeMinutes = timeNow.getMinutes();
 
+        // function direction(value) {
+        //     if (value >= 0 && value < 22.5 || value >=337.5) {
+        //         return 'North';
+        //     } else if (value >= 22.5 && value < 67.5) {
+        //         return 'Northeast';
+        //     } else if (value >= 67.5 && value < 112.5) {
+        //         return 'East';
+        //     } else if (value >= 112.5 && value < 157.5) {
+        //         return 'Southeast';
+        //     } else if (value >= 157.5 && value < 202.5) {
+        //         return 'South';
+        //     } else if (value >= 202.5 && value < 247.5) {
+        //             return 'Southwest';
+        //     } else if (value >= 247.5 && value <292.5) {
+        //             return 'West';
+        //     } else if (value >= 292.5 && value <337.5) {
+        //             return 'Northwest';
+        //     }
+        // };
+
+        // Southeast = 135
+
         function direction(value) {
             if (value >= 0 && value < 22.5 || value >=337.5) {
-                return 'North';
+                return 0;
             } else if (value >= 22.5 && value < 67.5) {
-                return 'Northeast';
+                return 45;
             } else if (value >= 67.5 && value < 112.5) {
-                return 'East';
+                return 90;
             } else if (value >= 112.5 && value < 157.5) {
-                return 'Southeast';
+                return 135;
             } else if (value >= 157.5 && value < 202.5) {
-                return 'South';
+                return 180;
             } else if (value >= 202.5 && value < 247.5) {
-                    return 'Southwest';
+                    return 225;
             } else if (value >= 247.5 && value <292.5) {
-                    return 'West';
+                    return 270;
             } else if (value >= 292.5 && value <337.5) {
-                    return 'Northwest';
+                    return 315;
             }
         };
+
+// Wind types that usues the wind direction and surf spots pointing direction to determin tyoe of wind for location
+
+        // var wind = direction(windDirection);
+        var wind = direction(windDirection);
+        var point = surfSpot.point;
+
+        console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
+
+        // var North = 0;
+        // var Northeast = 45;
+        // var East = 90;
+        // var Southeast = 135;
+        // var South = 180;
+        // var Southwest = 225;
+        // var West = 270;
+        // var Northwest = 315;
+
+        var range = [wind, point];
+
+        console.log('An Array of wind & point direction values: ' + range);
+        
+        function check() {
+            if ((wind - point) === 0) {
+              return 'Offshore';
+            } else if (
+              (range[0] === 0) && (range[1] === 180) ||
+              (range[0] === 180) && (range[1] === 0) ||
+              (range[0] === 90) && (range[1] === 270) ||
+              (range[0] === 270) && (range[1] === 90) ||
+              (range[0] === 45) && (range[1] === 225) ||
+              (range[0] === 225) && (range[1] === 45) ||
+              (range[0] === 135) && (range[1] === 315) ||
+              (range[0] === 315) && (range[1] === 135)) {
+              return 'Onshore';
+            } else {
+              return 'Crosswind';
+            }
+          }
+        
+        console.log('Type of wind result is: ' + check());
+
+        // console.log(offshore);
+        // console.log(onshore);
+        // console.log(windType());
+
+        // console.log(typeof(wind));
+        // console.log(typeof(point));
+        // console.log(wind === point);
+        // console.log(windType());
+
+// OUTPUT
 
         output += '<div>' +
             '<ul>' +
@@ -280,12 +357,64 @@ xhr.onreadystatechange = function() {
                 '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<li>Wind Direction from: '+windDirection+'</li>' +
+                '<li>Wind: '+check()+'</li>' +
                 '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
             document.getElementById('data02').innerHTML = output;
 
+// OUTPUT 2 NOW
+
+        var outputtwo = '';
+
+        // Time NOW
+
+        var timeNow = new Date();
+        // var timeNowHour = timeNow.getHours();
+
+        var timeNowHour = 13;
+
+        console.log('Current time (Hour): ' + timeNowHour);
+
+        // UTC time to Hour and Minutes + Check the current Hour and provide data for that Time
+
+        var timeWeather = new Date(weather.hours[timeNowHour].time);
+        var timeWeatherHour = timeWeather.getUTCHours();
+
+        console.log('Time from API (Hour): ' + timeWeatherHour);
+
+        var dataNow = weather.hours[timeNowHour];
+
+        var airTemperature = Math.round(dataNow.airTemperature[0].value);
+        var waterTemperature = Math.round(dataNow.waterTemperature[0].value);
+        var waveHeight = (dataNow.waveHeight[0].value).toFixed(1);
+        var wavePeriod = Math.round(dataNow.wavePeriod[0].value);
+        var swellDirection = (dataNow.swellDirection[0].value).toFixed(1);
+        var windDirection = (dataNow.windDirection[0].value).toFixed(1);
+        var windSpeed = Math.round(dataNow.windSpeed[0].value);
+
+        outputtwo += '<div>' +
+            '<ul>' +
+                '<li>Today is: '+timeNow+'</li>'+
+                '<li>Surf Spot: '+surfSpot.title+'</li>' +
+                '<br>' +
+                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+                '<br>' +
+                '<li>Wave Height: '+waveHeight+' m</li>' +
+                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+                '<br>' +
+                '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<li>Wind: '+check()+'</li>' +
+                '<br>' +
+                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+            '</ul>'
+
+            document.getElementById('data04').innerHTML = outputtwo;
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -347,16 +476,16 @@ xhr.onreadystatechange = function() {
             return tidesTimeValue[time] = tidesValue[i];
         });
 
-        console.log(tidesTime[10]);
+        // console.log(tidesTime[10]);
 
         // UTC time to Hour and Minutes
 
         var time = new Date(tidesTime[10]);
         var timeHM = time.getUTCHours() + ':' + time.getUTCMinutes();
 
-        console.log(timeHM);
+        // console.log(timeHM);
        
-        console.log(tidesValue);
+        // console.log(tidesValue);
 
         // the tidesValue index reflect the time as well since the first element (i.e index 0) equal the midnight 00:00
 
@@ -373,7 +502,7 @@ xhr.onreadystatechange = function() {
                 });
         };
 
-        console.log(dataApi);
+        // console.log(dataApi);
 
 
 // LINE CHART
