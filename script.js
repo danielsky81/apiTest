@@ -152,6 +152,8 @@ xhr.onreadystatechange = function() {
 
         var output = '';
 
+// Unix time to local time conversion
+
         function unixToLocal(t) {
             var dt = new Date(t*1000);
             var hr = dt.getHours();
@@ -194,7 +196,7 @@ xhr.send();
 
 // ****************************************************************** Stormglass API
 
-const params = 'airTemperature,waterTemperature,waveHeight,wavePeriod,swellDirection,windDirection,windSpeed';
+const params = 'airTemperature,waterTemperature,waveHeight,wavePeriod,swellDirection,swellHeight,swellPeriod,windDirection,windSpeed';
 
 var xhr = new XMLHttpRequest();
 xhr.open('GET', `https://api.stormglass.io/point?lat=${lat}&lng=${lng}&params=${params}`, true);
@@ -214,23 +216,24 @@ xhr.onreadystatechange = function() {
 
 // getting an average values for data values with several sources
 // maybe stick to the first source i.e. SG as it is the most frequent and first in all data
+// NOT REQUIRED ANYMORE
 
-        var total = 0;
-        var length = 0;
+        // var total = 0;
+        // var length = 0;
 
-        for (var v in weather.hours[12].airTemperature) {
-            total += weather.hours[12].airTemperature[v].value;
-            length++;
-        };
+        // for (var v in weather.hours[12].airTemperature) {
+        //     total += weather.hours[12].airTemperature[v].value;
+        //     length++;
+        // };
 
-        var averageAirTemp = total / length;
+        // var averageAirTemp = total / length;
 
-        console.log('Average Air Temperature: ' +averageAirTemp);
+        // console.log('Average Air Temperature: ' +averageAirTemp);
 
 // Data break down into types and values:
 
         var time = weather.hours[12].time;
-        var airTemperature = Math.round(averageAirTemp);
+        var airTemperature = Math.round(airTemperature);
         var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
         var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
         var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
@@ -240,12 +243,14 @@ xhr.onreadystatechange = function() {
 
         var timeNow = new Date();
 
-        console.log('Todays date and time: ' + timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
+        console.log('Todays date: ' + timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
 
 // Display time for tidal & temperature information
 
         var timeHour = ('0' + timeNow.getHours()).slice(-2);
         var timeMinutes = timeNow.getMinutes();
+
+// Function to return Word Direction in Names:
 
         // function direction(value) {
         //     if (value >= 0 && value < 22.5 || value >=337.5) {
@@ -267,7 +272,7 @@ xhr.onreadystatechange = function() {
         //     }
         // };
 
-        // Southeast = 135
+// Function that return degrees that fall withing range of word directions:
 
         function direction(value) {
             if (value >= 0 && value < 22.5 || value >=337.5) {
@@ -330,16 +335,27 @@ xhr.onreadystatechange = function() {
         
         console.log('Type of wind result is: ' + check());
 
-        // console.log(offshore);
-        // console.log(onshore);
-        // console.log(windType());
 
-        // console.log(typeof(wind));
-        // console.log(typeof(point));
-        // console.log(wind === point);
-        // console.log(windType());
+// Alternative simpler solution:
 
-// OUTPUT
+// function checkDirection(wind, point) {
+    
+//     let direction;
+//     let array = [[0, 180],[45, 225],[90, 270],[135, 315]];
+    
+//     if (wind - point === 0) return 'Offshore';
+
+//     array.forEach( arr => {
+//         if (arr.includes(wind) && arr.includes(point)) {
+//             return direction =  true;
+//         }
+//     });
+
+//     return direction ? 'Onshore' : 'Crosswind';
+// }
+// console.log(checkDirection(45, 225))
+
+// OUTPUT 1 - As per API requested time
 
         output += '<div>' +
             '<ul>' +
@@ -358,7 +374,7 @@ xhr.onreadystatechange = function() {
                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
                 '<li>Wind Direction from: '+windDirection+'</li>' +
-                '<li>Wind: '+check()+'</li>' +
+                '<li>Wind: '+range+' '+check()+'</li>' +
                 '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
@@ -406,15 +422,169 @@ xhr.onreadystatechange = function() {
                 '<li>Wave Height: '+waveHeight+' m</li>' +
                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
                 '<br>' +
-                '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
-                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
-                '<li>Wind: '+check()+'</li>' +
-                '<br>' +
+                // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+                // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+                // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+                '<li>Wind: '+range+' '+check()+'</li>' +
+                // '<br>' +
                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
             '</ul>'
 
             document.getElementById('data04').innerHTML = outputtwo;
+
+
+// OUTPUT 3
+
+var outputthree = '';
+
+var dataNow = weather.hours[timeNowHour];
+
+var airTemperature0 = Math.round(weather.hours[0].airTemperature[0].value);
+var airTemperature1 = Math.round(weather.hours[2].airTemperature[0].value);
+var airTemperature2 = Math.round(weather.hours[4].airTemperature[0].value);
+var airTemperature3 = Math.round(weather.hours[6].airTemperature[0].value);
+var airTemperature4 = Math.round(weather.hours[8].airTemperature[0].value);
+var airTemperature5 = Math.round(weather.hours[10].airTemperature[0].value);
+var airTemperature6 = Math.round(weather.hours[12].airTemperature[0].value);
+var airTemperature7 = Math.round(weather.hours[14].airTemperature[0].value);
+var airTemperature8 = Math.round(weather.hours[16].airTemperature[0].value);
+var airTemperature9 = Math.round(weather.hours[18].airTemperature[0].value);
+var airTemperature10 = Math.round(weather.hours[20].airTemperature[0].value);
+var airTemperature11 = Math.round(weather.hours[22].airTemperature[0].value);
+var airTemperature12 = Math.round(weather.hours[23].airTemperature[0].value);
+var waterTemperature1 = Math.round(weather.hours[0].waterTemperature[0].value);
+var waterTemperature2 = Math.round(weather.hours[2].waterTemperature[0].value);
+var waterTemperature3 = Math.round(weather.hours[4].waterTemperature[0].value);
+var waterTemperature4 = Math.round(weather.hours[6].waterTemperature[0].value);
+var waterTemperature5 = Math.round(weather.hours[8].waterTemperature[0].value);
+var waterTemperature6 = Math.round(weather.hours[10].waterTemperature[0].value);
+var waterTemperature7 = Math.round(weather.hours[12].waterTemperature[0].value);
+var waterTemperature8 = Math.round(weather.hours[14].waterTemperature[0].value);
+var waterTemperature9 = Math.round(weather.hours[16].waterTemperature[0].value);
+var waterTemperature10 = Math.round(weather.hours[18].waterTemperature[0].value);
+var waterTemperature11 = Math.round(weather.hours[20].waterTemperature[0].value);
+var waterTemperature12 = Math.round(weather.hours[22].waterTemperature[0].value);
+
+var waveHeight1 = (weather.hours[0].waveHeight[0].value).toFixed(1);
+var waveHeight2 = (weather.hours[2].waveHeight[0].value).toFixed(1);
+var waveHeight3 = (weather.hours[4].waveHeight[0].value).toFixed(1);
+var waveHeight4 = (weather.hours[6].waveHeight[0].value).toFixed(1);
+var waveHeight5 = (weather.hours[8].waveHeight[0].value).toFixed(1);
+var waveHeight6 = (weather.hours[10].waveHeight[0].value).toFixed(1);
+var waveHeight7 = (weather.hours[12].waveHeight[0].value).toFixed(1);
+var waveHeight8 = (weather.hours[14].waveHeight[0].value).toFixed(1);
+var waveHeight9 = (weather.hours[16].waveHeight[0].value).toFixed(1);
+var waveHeight10 = (weather.hours[18].waveHeight[0].value).toFixed(1);
+var waveHeight11 = (weather.hours[20].waveHeight[0].value).toFixed(1);
+var waveHeight12 = (weather.hours[22].waveHeight[0].value).toFixed(1);
+
+var swellHeight1 = (weather.hours[0].swellHeight[0].value).toFixed(1);
+var swellHeight2 = (weather.hours[2].swellHeight[0].value).toFixed(1);
+var swellHeight3 = (weather.hours[4].swellHeight[0].value).toFixed(1);
+var swellHeight4 = (weather.hours[6].swellHeight[0].value).toFixed(1);
+var swellHeight5 = (weather.hours[8].swellHeight[0].value).toFixed(1);
+var swellHeight6 = (weather.hours[10].swellHeight[0].value).toFixed(1);
+var swellHeight7 = (weather.hours[12].swellHeight[0].value).toFixed(1);
+var swellHeight8 = (weather.hours[14].swellHeight[0].value).toFixed(1);
+var swellHeight9 = (weather.hours[16].swellHeight[0].value).toFixed(1);
+var swellHeight10 = (weather.hours[18].swellHeight[0].value).toFixed(1);
+var swellHeight11 = (weather.hours[20].swellHeight[0].value).toFixed(1);
+var swellHeight12 = (weather.hours[22].swellHeight[0].value).toFixed(1);
+
+var swellPeriod1 = (weather.hours[0].swellPeriod[0].value).toFixed(1);
+var swellPeriod2 = (weather.hours[2].swellPeriod[0].value).toFixed(1);
+var swellPeriod3 = (weather.hours[4].swellPeriod[0].value).toFixed(1);
+var swellPeriod4 = (weather.hours[6].swellPeriod[0].value).toFixed(1);
+var swellPeriod5 = (weather.hours[8].swellPeriod[0].value).toFixed(1);
+var swellPeriod6 = (weather.hours[10].swellPeriod[0].value).toFixed(1);
+var swellPeriod7 = (weather.hours[12].swellPeriod[0].value).toFixed(1);
+var swellPeriod8 = (weather.hours[14].swellPeriod[0].value).toFixed(1);
+var swellPeriod9 = (weather.hours[16].swellPeriod[0].value).toFixed(1);
+var swellPeriod10 = (weather.hours[18].swellPeriod[0].value).toFixed(1);
+var swellPeriod11 = (weather.hours[20].swellPeriod[0].value).toFixed(1);
+var swellPeriod12 = (weather.hours[22].swellPeriod[0].value).toFixed(1);
+
+var wavePeriod1 = Math.round(weather.hours[0].wavePeriod[0].value);
+var wavePeriod2 = Math.round(weather.hours[2].wavePeriod[0].value);
+var wavePeriod3 = Math.round(weather.hours[4].wavePeriod[0].value);
+var wavePeriod4 = Math.round(weather.hours[6].wavePeriod[0].value);
+var wavePeriod5 = Math.round(weather.hours[8].wavePeriod[0].value);
+var wavePeriod6 = Math.round(weather.hours[10].wavePeriod[0].value);
+var wavePeriod7 = Math.round(weather.hours[12].wavePeriod[0].value);
+var wavePeriod8 = Math.round(weather.hours[14].wavePeriod[0].value);
+var wavePeriod9 = Math.round(weather.hours[16].wavePeriod[0].value);
+var wavePeriod10 = Math.round(weather.hours[18].wavePeriod[0].value);
+var wavePeriod11 = Math.round(weather.hours[20].wavePeriod[0].value);
+var wavePeriod12 = Math.round(weather.hours[22].wavePeriod[0].value);
+
+var swellDirection1 = (weather.hours[0].swellDirection[0].value).toFixed(1);
+var swellDirection2 = (weather.hours[4].swellDirection[0].value).toFixed(1);
+var swellDirection3 = (weather.hours[8].swellDirection[0].value).toFixed(1);
+var swellDirection4 = (weather.hours[12].swellDirection[0].value).toFixed(1);
+var swellDirection5 = (weather.hours[18].swellDirection[0].value).toFixed(1);
+var swellDirection6 = (weather.hours[22].swellDirection[0].value).toFixed(1);
+
+var windDirection1 = (weather.hours[0].windDirection[0].value).toFixed(1);
+var windDirection2 = (weather.hours[4].windDirection[0].value).toFixed(1);
+var windDirection3 = (weather.hours[8].windDirection[0].value).toFixed(1);
+var windDirection4 = (weather.hours[12].windDirection[0].value).toFixed(1);
+var windDirection5 = (weather.hours[18].windDirection[0].value).toFixed(1);
+var windDirection6 = (weather.hours[22].windDirection[0].value).toFixed(1);
+
+// var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
+var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
+
+   outputthree += '<div>' +
+        '<ul>' +
+            '<li>Today is: '+timeNow+'</li>'+
+            '<li>Surf Spot: '+surfSpot.title+'</li>' +
+            '<br>' +
+            '<li>Air Temperature: '+airTemperature0+' &#8451 | Water Temperature: '+waterTemperature1+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature1+' &#8451 | Water Temperature: '+waterTemperature2+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature2+' &#8451 | Water Temperature: '+waterTemperature3+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature3+' &#8451 | Water Temperature: '+waterTemperature4+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature4+' &#8451 | Water Temperature: '+waterTemperature5+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature5+' &#8451 | Water Temperature: '+waterTemperature6+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature6+' &#8451 | Water Temperature: '+waterTemperature7+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature7+' &#8451 | Water Temperature: '+waterTemperature8+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature8+' &#8451 | Water Temperature: '+waterTemperature9+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature9+' &#8451 | Water Temperature: '+waterTemperature10+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature10+' &#8451 | Water Temperature: '+waterTemperature11+' &#8451</li>' +
+            '<li>Air Temperature: '+airTemperature11+' &#8451 | Water Temperature: '+waterTemperature12+' &#8451</li>' +
+            '<br>' +
+            '<li>Wave/Swell Height: '+waveHeight1+' / '+swellHeight1+'  m | Wave/Swell Period: '+wavePeriod1+' / '+swellPeriod1+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight2+' / '+swellHeight2+' m | Wave/Swell Period: '+wavePeriod2+' / '+swellPeriod2+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight3+' / '+swellHeight3+' m | Wave/Swell Period: '+wavePeriod3+' / '+swellPeriod3+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight4+' / '+swellHeight4+' m | Wave/Swell Period: '+wavePeriod4+' / '+swellPeriod4+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight5+' / '+swellHeight5+' m | Wave/Swell Period: '+wavePeriod5+' / '+swellPeriod5+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight6+' / '+swellHeight6+' m | Wave/Swell Period: '+wavePeriod6+' / '+swellPeriod6+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight7+' / '+swellHeight7+' m | Wave/Swell Period: '+wavePeriod7+' / '+swellPeriod7+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight8+' / '+swellHeight8+' m | Wave/Swell Period: '+wavePeriod8+' / '+swellPeriod8+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight9+' / '+swellHeight9+' m | Wave/Swell Period: '+wavePeriod9+' / '+swellPeriod9+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight10+' / '+swellHeight10+' m | Wave/Swell Period: '+wavePeriod10+' / '+swellPeriod10+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight11+' / '+swellHeight11+' m | Wave/Swell Period: '+wavePeriod11+' / '+swellPeriod11+' seconds</li>' +
+            '<li>Wave/Swell Height: '+waveHeight12+' / '+swellHeight12+' m | Wave/Swell Period: '+wavePeriod12+' / '+swellPeriod12+' seconds</li>' +
+            '<br>' +
+            '<li>Swell Direction: '+swellDirection1+' | Wave Direction: '+windDirection1+' </li>' +
+            '<li>Swell Direction: '+swellDirection2+' | Wave Direction: '+windDirection2+' </li>' +
+            '<li>Swell Direction: '+swellDirection3+' | Wave Direction: '+windDirection3+' </li>' +
+            '<li>Swell Direction: '+swellDirection4+' | Wave Direction: '+windDirection4+' </li>' +
+            '<li>Swell Direction: '+swellDirection5+' | Wave Direction: '+windDirection5+' </li>' +
+            '<li>Swell Direction: '+swellDirection6+' | Wave Direction: '+windDirection6+' </li>' +
+            '<br>' +
+            // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+            // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+            // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+            '<li>Wind: '+range+' '+check()+'</li>' +
+            '<br>' +
+            '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+        '</ul>'
+
+        document.getElementById('data05').innerHTML = outputthree;
+
+// OUTPUT 4 AVERAGES
+
+
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data02').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -429,8 +599,8 @@ xhr.send();
 
 // ****************************************************************** Marine Institute of Ireland data
 
-var timeFrom = '2018-12-10T00%3A00%3A00Z';
-var timeTo = '2018-12-11T00%3A00%3A00Z';
+var timeFrom = '2018-12-15T00%3A00%3A00Z';
+var timeTo = '2018-12-16T00%3A00%3A00Z';
 var stationId = '%22Dublin_Port%22';
 
 var xhr = new XMLHttpRequest();
