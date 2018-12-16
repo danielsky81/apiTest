@@ -584,6 +584,155 @@ var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
 
 // OUTPUT 4 AVERAGES
 
+// average from Sunrise till 11:00 | 11:00 till 14:00 | 14:00 till Sunset
+
+        // var morning = [5,6,7,8,9,10];
+        // var midday = [11,12,13,14];
+        // var afternoon = [15,16,17,18,19,20];
+
+        var outputfour = '';
+
+        // this should be a function that when pass an argument it will throw a array with values for that
+        // particular argument so function morning(parameter) { do sth }
+
+        var morning = [weather.hours[5].airTemperature[0].value,
+                        weather.hours[6].airTemperature[0].value,
+                        weather.hours[7].airTemperature[0].value,
+                        weather.hours[8].airTemperature[0].value,
+                        weather.hours[9].airTemperature[0].value,
+                        weather.hours[10].airTemperature[0].value];
+
+        var midday = [weather.hours[11].airTemperature[0].value,
+                        weather.hours[12].airTemperature[0].value,
+                        weather.hours[13].airTemperature[0].value,
+                        weather.hours[14].airTemperature[0].value];
+
+        var afternoon = [weather.hours[15].airTemperature[0].value,
+                            weather.hours[16].airTemperature[0].value,
+                            weather.hours[17].airTemperature[0].value,
+                            weather.hours[18].airTemperature[0].value,
+                            weather.hours[19].airTemperature[0].value,
+                            weather.hours[20].airTemperature[0].value];
+
+// OPTION 1
+
+var waveHeight = 'waveHeight[0].value';
+var wavePeriod = 'wavePeriod[0].value';
+var windDirection = 'windDirection[0].value';
+var windSpeed = 'windSpeed[0].value';
+var airTemperature = '.airTemperature[0].value';
+var waterTemperature = '.waterTemperature[0].value';
+var parameter = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+
+var morning = [5, 6, 7, 8, 9, 10];
+var midday = [11,12,13,14];
+var afternoon = [15, 16, 17, 18, 19, 20];
+var dayTime = [];
+
+var timeType = function(time, type) {
+  time.forEach(function(item) {
+    dayTime.push(weather.hours[item]);
+  });
+  var mapping = dayTime.map(function (num) {
+    return num+type;
+  });
+
+  for (var i = 0; i < mapping.length; i++) {
+    mapping[i] = mapping[i].replace(/"/g,'');
+  };
+
+  return mapping
+}
+
+console.log(timeType(afternoon, parameter[0]));
+console.log(weather.hours[14].waterTemperature[0].value);
+
+// var morningAv = [];
+
+// morning.forEach(function(item) {
+//   morningAv.push('weather.hour['+item+']'+parameter[0]);
+// });
+
+// console.log(morningAv);
+
+// var midday = [11,12,13,14];
+// var middayAv = [];
+
+// midday.forEach(function(item) {
+//   middayAv.push('weather.hour['+item+']'+parameter[1]);
+// });
+
+// console.log(middayAv);
+
+// var afternoon = [15, 16, 17, 18, 19, 20];
+// var afternoonAv = [];
+
+// afternoon.forEach(function(item) {
+//   afternoonAv.push('weather.hour['+item+']'+airTemperature);
+// });
+
+// console.log(afternoonAv);
+
+        // var morningSum = morning.reduce(function (accumulator, currentValue) {
+        //     return accumulator + currentValue;
+        //   }, 0);
+
+        // var morningAv = Math.round(morningSum / morning.length);
+
+        //   console.log(morningAv);
+
+        //   var middaySum = midday.reduce(function (accumulator, currentValue) {
+        //     return accumulator + currentValue;
+        //   }, 0);
+
+        // var middayAv = Math.round(middaySum / midday.length);
+
+        //   console.log(middayAv);
+
+        //   var afternoonSum = afternoon.reduce(function (accumulator, currentValue) {
+        //     return accumulator + currentValue;
+        //   }, 0);
+
+        // var afternoonAv = Math.round(afternoonSum / afternoon.length);
+
+        //   console.log(afternoonAv);
+
+          var airTemperature = '.airTemperature[0].value';
+          var waterTemperature = '.waterTemperature[0].value';
+
+        //   var morning = 'weather.hours[5]';
+        // var morning = [5, 7, 8, 9, 10];
+
+        // var dayTime = morning.forEach(function(element) {
+        //     return weather.hours[element];
+        //     });
+
+        // console.log(dayTime);
+
+        //   function averageData(parameter, dayTime) {
+        //       return dayTime+parameter;
+
+        //   };
+
+        // console.log(averageData(waterTemperature, morning));
+
+          outputfour += '<div>' +
+            '<h1>Day Forecast</h1>' +
+            '<h2>Morning</h2>' +
+            '<h3>Wave</h3>' +
+            '<p>Height: '+middayAv+'</p>' +
+            '<p>Period: '+middayAv+'</p>' +
+            '<h2>Midday</h2>' +
+            '<h3>Wave</h3>' +
+            '<p>Height: '+middayAv+'</p>' +
+            '<p>Period: '+middayAv+'</p>' +
+            '<h2>Afternoon</h2>' +
+            '<h3>Wave</h3>' +
+            '<p>Height: '+middayAv+'</p>' +
+            '<p>Period: '+middayAv+'</p>'
+
+
+          document.getElementById('data06').innerHTML = outputfour;
 
 
     } else if (this.readyState == 4 && this.status == 402) {
