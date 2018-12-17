@@ -148,7 +148,14 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        // console.log(openWeather);
+        console.log(openWeather);
+
+// Local storage Test
+
+        var openWeatherApi = openWeather;
+        var localData;
+
+        localStorage.setItem('openWeatherApi', JSON.stringify(openWeather));
 
         var output = '';
 
@@ -207,8 +214,80 @@ xhr.onreadystatechange = function() {
 
     if (this.readyState == 4 && this.status == 200) {
         var weather = JSON.parse(this.responseText);
-        console.log('Stormglass API JSON data:');
-        console.log(weather);
+        // console.log('Stormglass API JSON data:');
+
+        localStorage.setItem('added-data', weather);
+
+console.log(weather); // unspliced
+
+var weatherSpliced = (weather.hours).splice(24);
+
+// console.log(weather); // day data
+
+var afternoon = (weather.hours).splice(-9, 6);
+
+                    // console.log(afternoon);
+                    // console.log(afternoon[0].airTemperature[0].value);
+                    // console.log(weather);
+
+var midday = (weather.hours).splice(-7, 4);
+
+var morning = (weather.hours).splice(-9, 6);
+
+                    // console.log(morning);
+                    // console.log(midday);
+                    // console.log(afternoon);
+
+                    // console.log(total);
+
+                    // for (var v in morning) {
+                    //     total += morning[v].airTemperature[0].value;
+                    //     console.log(total);
+                    // }
+
+                    // for (var i = 0; i < morning.length; i++) {
+                    //     total += morning[i].airTemperature[0].value;
+                    //     console.log(total);
+                    // }
+
+// function that calculate an average data for selection of arrays:
+
+// function timeOfDay(time) {
+//     var total = 0;
+//     time.forEach(function(hour) {
+//         total += hour.airTemperature[0].value;
+//         console.log(total);
+//     });
+//     var average = Math.round(total / time.length);
+//     return average;
+// }
+
+var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+
+function timeOfDay(time, param) {
+    var total = 0;
+    time.forEach(function(hour) {
+        total += hour.parameters[0].value;
+        console.log(total);
+    });
+    var average = Math.round(total / time.length);
+    return average;
+}
+
+console.log(timeOfDay(midday));
+console.log(timeOfDay(morning));
+console.log(timeOfDay(afternoon));
+
+// morning.forEach(function(hour) {
+//     total += hour.airTemperature[0].value;
+//     console.log(total);
+// });
+
+var morningAv = Math.round(total / morning.length) 
+
+console.log(morningAv);
+
+
 
         // DATA
 
@@ -622,7 +701,7 @@ var windDirection = 'windDirection[0].value';
 var windSpeed = 'windSpeed[0].value';
 var airTemperature = '.airTemperature[0].value';
 var waterTemperature = '.waterTemperature[0].value';
-var parameter = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
 
 var morning = [5, 6, 7, 8, 9, 10];
 var midday = [11,12,13,14];
@@ -630,55 +709,63 @@ var afternoon = [15, 16, 17, 18, 19, 20];
 var dayTime = [];
 
 var timeType = function(time, type) {
-  time.forEach(function(item) {
-    dayTime.push(weather.hours[item]);
-  });
-  var mapping = dayTime.map(function (num) {
+time.forEach(function(item) {
+    dayTime.push('weather.hours['+item+']');
+});
+var mapping = dayTime.map(function (num) {
     return num+type;
-  });
+});
 
-  for (var i = 0; i < mapping.length; i++) {
-    mapping[i] = mapping[i].replace(/"/g,'');
-  };
+//   for (var i = 0; i < mapping.length; i++) {
+//     mapping[i] = mapping[i].replace(/"/g,'');
+//   };
 
-  return mapping
+return mapping
 }
 
-console.log(timeType(afternoon, parameter[0]));
-console.log(weather.hours[14].waterTemperature[0].value);
+// console.log(timeType(midday, parameters[1]));
 
-// var morningAv = [];
+// console.log(timeType(afternoon, parameters[0]));
 
-// morning.forEach(function(item) {
-//   morningAv.push('weather.hour['+item+']'+parameter[0]);
-// });
 
-// console.log(morningAv);
+// Part 1 - This function give us the array of data for particular day
 
-// var midday = [11,12,13,14];
-// var middayAv = [];
+                    // var morning = [5, 6, 7, 8, 9, 10];
+                    // var morningAv = [];
 
-// midday.forEach(function(item) {
-//   middayAv.push('weather.hour['+item+']'+parameter[1]);
-// });
+                    // morning.forEach(function(item) {
+                    //   morningAv.push('weather.hour['+item+']'+parameters[0]);
+                    // });
 
-// console.log(middayAv);
+                    // console.log(morningAv);
 
-// var afternoon = [15, 16, 17, 18, 19, 20];
-// var afternoonAv = [];
+                    // var midday = [11,12,13,14];
+                    // var middayAv = [];
 
-// afternoon.forEach(function(item) {
-//   afternoonAv.push('weather.hour['+item+']'+airTemperature);
-// });
+                    // midday.forEach(function(item) {
+                    //   middayAv.push('weather.hour['+item+']'+parameters[1]);
+                    // });
 
-// console.log(afternoonAv);
+                    // console.log(middayAv);
 
-        // var morningSum = morning.reduce(function (accumulator, currentValue) {
-        //     return accumulator + currentValue;
-        //   }, 0);
+                    // var afternoon = [15, 16, 17, 18, 19, 20];
+                    // var afternoonAv = [];
 
-        // var morningAv = Math.round(morningSum / morning.length);
+                    // afternoon.forEach(function(item) {
+                    //   afternoonAv.push('weather.hour['+item+']'+airTemperature);
+                    // });
 
+                    // console.log(afternoonAv);
+
+// Part 2 = the actual calculations
+
+        var morningSum = (timeType(morning, parameters[0])).reduce(function (accumulator, currentValue) {
+            return accumulator + currentValue;
+          }, 0);
+
+        var morningAv = Math.round(morningSum / (timeType(morning, parameters[0])).length);
+
+        // console.log(typeof(morningAv));
         //   console.log(morningAv);
 
         //   var middaySum = midday.reduce(function (accumulator, currentValue) {
@@ -697,42 +784,46 @@ console.log(weather.hours[14].waterTemperature[0].value);
 
         //   console.log(afternoonAv);
 
-          var airTemperature = '.airTemperature[0].value';
-          var waterTemperature = '.waterTemperature[0].value';
+                            // var airTemperature = '.airTemperature[0].value';
+                            // var waterTemperature = '.waterTemperature[0].value';
 
-        //   var morning = 'weather.hours[5]';
-        // var morning = [5, 7, 8, 9, 10];
+                            // var morning = 'weather.hours[5]';
+                            // var morning = [5, 7, 8, 9, 10];
 
-        // var dayTime = morning.forEach(function(element) {
-        //     return weather.hours[element];
-        //     });
+                            // var dayTime = morning.forEach(function(element) {
+                            //     return weather.hours[element];
+                            //     });
 
-        // console.log(dayTime);
+                            // console.log(dayTime);
 
-        //   function averageData(parameter, dayTime) {
-        //       return dayTime+parameter;
+                            // function averageData(parameter, dayTime) {
+                            //     dayTime.forEach(function(item) {
+                            //         return dayTime+parameter;
+                            //     })
+                                
 
-        //   };
+                            // };
 
-        // console.log(averageData(waterTemperature, morning));
+                            // console.log(averageData(waterTemperature, morning));
 
-          outputfour += '<div>' +
-            '<h1>Day Forecast</h1>' +
-            '<h2>Morning</h2>' +
-            '<h3>Wave</h3>' +
-            '<p>Height: '+middayAv+'</p>' +
-            '<p>Period: '+middayAv+'</p>' +
-            '<h2>Midday</h2>' +
-            '<h3>Wave</h3>' +
-            '<p>Height: '+middayAv+'</p>' +
-            '<p>Period: '+middayAv+'</p>' +
-            '<h2>Afternoon</h2>' +
-            '<h3>Wave</h3>' +
-            '<p>Height: '+middayAv+'</p>' +
-            '<p>Period: '+middayAv+'</p>'
+        //   outputfour += '<div>' +
+        //     '<h1>Day Forecast</h1>' +
+        //     '<h2>Morning</h2>' +
+        //     '<h3>Wave</h3>' +
+        //     '<p>Height: '+timeType(morning, parameter[0])+'</p>' +
+        //     '<p>Period: '+timeType(morning, parameter[1])+'</p>' +
+        //     '<h2>Midday</h2>' +
+        //     '<h3>Wave</h3>' +
+        //     '<p>Height: '+timeType(midday, parameter[0])+'</p>' +
+        //     '<p>Period: '+timeType(midday, parameter[1])+'</p>' +
+        //     '<h2>Afternoon</h2>' +
+        //     '<h3>Wave</h3>' +
+        //     '<p>Height: '+timeType(afternoon, parameter[0])+'</p>' +
+        //     '<p>Period: '+timeType(afternoon, parameter[1])+'</p>'
 
+        //     console.log(timeType(afternoon, parameter[0]));
 
-          document.getElementById('data06').innerHTML = outputfour;
+        //   document.getElementById('data06').innerHTML = outputfour;
 
 
     } else if (this.readyState == 4 && this.status == 402) {
@@ -1063,3 +1154,38 @@ xhr.onerror = function() {
 };
 
 xhr.send();
+
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
+}
+
+if (storageAvailable('localStorage')) {
+    console.log('Yippee! We can use localStorage awesomeness');
+  } else {
+    console.log('Too bad, no localStorage for us');
+};
+
+localData = JSON.parse(localStorage.getItem('openWeatherApi'));
+
+console.log(localData.weather[0].main);
