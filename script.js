@@ -1358,14 +1358,16 @@ console.log(morningAverage.windDirection);
 
 // Wind types that usues the wind direction and surf spots pointing direction to determin tyoe of wind for location
 
-        var wind = direction(morningAverage.windDirection);
+    function windType(data) {
+
+        var wind = direction(data);
         var point = surfSpot.point;
 
-        console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
+        // console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
 
         var range = [wind, point];
 
-        console.log('An Array of wind & point direction values: ' + range);
+        // console.log('An Array of wind & point direction values: ' + range);
         
         function check() {
             if ((wind - point) === 0) {
@@ -1384,8 +1386,13 @@ console.log(morningAverage.windDirection);
               return 'Crosswind';
             }
           }
+
+        return check();
+    };
         
-        console.log('Type of wind result is: ' + check());
+        console.log('Type of wind result is: ' + windType(morningAverage.windDirection));
+        console.log('Type of wind result is: ' + windType(middayAverage.windDirection));
+        console.log('Type of wind result is: ' + windType(afternoonAverage.windDirection));
 
 // OUTPUT 1 - As per API requested time
 
@@ -1415,15 +1422,15 @@ output += '<div>' +
     '<br>' +
     '<h2>Morning</h2>' +
     '<p>Wave Height: '+morningAverage.waveHeight+' m | Wave Period: '+morningAverage.wavePeriod+' s</p>' +
-    '<p>Wind Type: '+morningAverage.waveHeight+' | Wind Speed: '+morningAverage.windSpeed+' m/s</p>' +
+    '<p>Wind Type: '+windType(morningAverage.windDirection)+' | Wind Speed: '+morningAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+morningAverage.airTemperature+' &#8451 | Water Temperature: '+morningAverage.waterTemperature+' &#8451</p>' +
     '<h2>Midday</h2>' +
     '<p>Wave Height: '+middayAverage.waveHeight+' m | Wave Period: '+middayAverage.wavePeriod+' s</p>' +
-    '<p>Wind Type: '+middayAverage.waveHeight+' | Wind Speed: '+middayAverage.windSpeed+' m/s</p>' +
+    '<p>Wind Type: '+windType(middayAverage.windDirection)+' | Wind Speed: '+middayAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+middayAverage.airTemperature+' &#8451 | Water Temperature: '+middayAverage.waterTemperature+' &#8451</p>' +
     '<h2>Afternoon</h2>' +
     '<p>Wave Height: '+afternoonAverage.waveHeight+' m | Wave Period: '+afternoonAverage.wavePeriod+' s</p>' +
-    '<p>Wind Type: '+afternoonAverage.waveHeight+' | Wind Speed: '+afternoonAverage.windSpeed+' m/s</p>' +
+    '<p>Wind Type: '+windType(afternoonAverage.windDirection)+' | Wind Speed: '+afternoonAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+afternoonAverage.airTemperature+' &#8451 | Water Temperature: '+afternoonAverage.waterTemperature+' &#8451</p>'
 
     document.getElementById('data02').innerHTML = output;
