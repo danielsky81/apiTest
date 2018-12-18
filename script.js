@@ -1,3 +1,37 @@
+// Local Storage Checks
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
+}
+
+if (storageAvailable('localStorage')) {
+    console.log('Yippee! We can use localStorage awesomeness');
+  } else {
+    console.log('Too bad, no localStorage for us');
+};
+
+// Surf Spots definition
+
 var surfSpots = [
     {title: 'Magheroarty, Co. Donegal', location: {lat: 55.162985, lng: -8.143272}},
     {title: 'Falcarragh, Co. Donegal', location: {lat: 55.16073, lng: -8.085937}},
@@ -148,47 +182,49 @@ xhr.open('GET', `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=
 xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
         var openWeather = JSON.parse(this.responseText);
-        console.log(openWeather);
+        // console.log(openWeather);
 
-// Local storage Test
+// Storing data locally
 
         var openWeatherApi = openWeather;
-        var localData;
+        var openWeatherApiData;
 
         localStorage.setItem('openWeatherApi', JSON.stringify(openWeather));
 
-        var output = '';
+// BELOW MOVED OUTSIDE XHR REQUEST AS STORED LOCALLY:
 
-// Unix time to local time conversion
+//         var output = '';
 
-        function unixToLocal(t) {
-            var dt = new Date(t*1000);
-            var hr = dt.getHours();
-            var m = '0' + dt.getMinutes();
-            return hr+ ':' +m.substr(-2); 
-        }
+// // Unix time to local time conversion
 
-        var sunrise = openWeather.sys.sunrise;
-        var sunset = openWeather.sys.sunset;
+//         function unixToLocal(t) {
+//             var dt = new Date(t*1000);
+//             var hr = dt.getHours();
+//             var m = '0' + dt.getMinutes();
+//             return hr+ ':' +m.substr(-2); 
+//         }
 
-        // console.log(unixToLocal(sunrise));
-        // console.log(unixToLocal(sunset));
-        // console.log(openWeather.weather[0].main);
-        // console.log(openWeather.main.temp);
-        // console.log(openWeather.wind.speed);
-        // console.log(openWeather.weather[0].description);
+//         var sunrise = openWeather.sys.sunrise;
+//         var sunset = openWeather.sys.sunset;
 
-        output += '<div>' +
-            '<ul>' +
-                '<li>Surf Spot: '+surfSpot.title+'</li>' +       
-                '<br>' +
-                '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
-                '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
-                '<br>' +
-                '<li>Weather: '+openWeather.weather[0].main+'</li>' +
-            '</ul>'
+//         // console.log(unixToLocal(sunrise));
+//         // console.log(unixToLocal(sunset));
+//         // console.log(openWeather.weather[0].main);
+//         // console.log(openWeather.main.temp);
+//         // console.log(openWeather.wind.speed);
+//         // console.log(openWeather.weather[0].description);
 
-            document.getElementById('data01').innerHTML = output;
+//         output += '<div>' +
+//             '<ul>' +
+//                 '<li>Surf Spot: '+surfSpot.title+'</li>' +       
+//                 '<br>' +
+//                 '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
+//                 '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
+//                 '<br>' +
+//                 '<li>Weather: '+openWeather.weather[0].main+'</li>' +
+//             '</ul>'
+
+//             document.getElementById('data01').innerHTML = output;
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -213,617 +249,624 @@ xhr.setRequestHeader('Authorization', 'b891271c-e610-11e8-83ef-0242ac130004-b891
 xhr.onreadystatechange = function() {
 
     if (this.readyState == 4 && this.status == 200) {
-        var weather = JSON.parse(this.responseText);
+        var weatherAPI = JSON.parse(this.responseText);
         // console.log('Stormglass API JSON data:');
 
-        localStorage.setItem('added-data', weather);
+// Storing data locally
 
-console.log(weather); // unspliced
+var stormglassAPI = weatherAPI;
+var stormglassAPIData;
 
-var weatherSpliced = (weather.hours).splice(24);
+localStorage.setItem('stormglassAPI', JSON.stringify(weatherAPI));
 
-// console.log(weather); // day data
+// MOVE OUTSIDE OF XHR REQUEST
 
-var afternoon = (weather.hours).splice(-9, 6);
+// console.log(weather); // unspliced
 
-                    // console.log(afternoon);
-                    // console.log(afternoon[0].airTemperature[0].value);
-                    // console.log(weather);
+// var weatherSpliced = (weather.hours).splice(24);
 
-var midday = (weather.hours).splice(-7, 4);
+// // console.log(weather); // day data
 
-var morning = (weather.hours).splice(-9, 6);
+// var afternoon = (weather.hours).splice(-9, 6);
 
-                    // console.log(morning);
-                    // console.log(midday);
-                    // console.log(afternoon);
+//                     // console.log(afternoon);
+//                     // console.log(afternoon[0].airTemperature[0].value);
+//                     // console.log(weather);
 
-                    // console.log(total);
+// var midday = (weather.hours).splice(-7, 4);
 
-                    // for (var v in morning) {
-                    //     total += morning[v].airTemperature[0].value;
-                    //     console.log(total);
-                    // }
+// var morning = (weather.hours).splice(-9, 6);
 
-                    // for (var i = 0; i < morning.length; i++) {
-                    //     total += morning[i].airTemperature[0].value;
-                    //     console.log(total);
-                    // }
+//                     // console.log(morning);
+//                     // console.log(midday);
+//                     // console.log(afternoon);
 
-// function that calculate an average data for selection of arrays:
+//                     // console.log(total);
 
-// function timeOfDay(time) {
+//                     // for (var v in morning) {
+//                     //     total += morning[v].airTemperature[0].value;
+//                     //     console.log(total);
+//                     // }
+
+//                     // for (var i = 0; i < morning.length; i++) {
+//                     //     total += morning[i].airTemperature[0].value;
+//                     //     console.log(total);
+//                     // }
+
+// // function that calculate an average data for selection of arrays:
+
+// // function timeOfDay(time) {
+// //     var total = 0;
+// //     time.forEach(function(hour) {
+// //         total += hour.airTemperature[0].value;
+// //         console.log(total);
+// //     });
+// //     var average = Math.round(total / time.length);
+// //     return average;
+// // }
+
+// var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+
+// function timeOfDay(time, param) {
 //     var total = 0;
 //     time.forEach(function(hour) {
-//         total += hour.airTemperature[0].value;
+//         total += hour.parameters[0].value;
 //         console.log(total);
 //     });
 //     var average = Math.round(total / time.length);
 //     return average;
 // }
 
-var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+// console.log(timeOfDay(midday));
+// console.log(timeOfDay(morning));
+// console.log(timeOfDay(afternoon));
 
-function timeOfDay(time, param) {
-    var total = 0;
-    time.forEach(function(hour) {
-        total += hour.parameters[0].value;
-        console.log(total);
-    });
-    var average = Math.round(total / time.length);
-    return average;
-}
+// // morning.forEach(function(hour) {
+// //     total += hour.airTemperature[0].value;
+// //     console.log(total);
+// // });
 
-console.log(timeOfDay(midday));
-console.log(timeOfDay(morning));
-console.log(timeOfDay(afternoon));
+// var morningAv = Math.round(total / morning.length) 
 
-// morning.forEach(function(hour) {
-//     total += hour.airTemperature[0].value;
-//     console.log(total);
+// console.log(morningAv);
+
+
+
+//         // DATA
+
+//         var output = '';
+
+// // getting an average values for data values with several sources
+// // maybe stick to the first source i.e. SG as it is the most frequent and first in all data
+// // NOT REQUIRED ANYMORE
+
+//         // var total = 0;
+//         // var length = 0;
+
+//         // for (var v in weather.hours[12].airTemperature) {
+//         //     total += weather.hours[12].airTemperature[v].value;
+//         //     length++;
+//         // };
+
+//         // var averageAirTemp = total / length;
+
+//         // console.log('Average Air Temperature: ' +averageAirTemp);
+
+// // Data break down into types and values:
+
+//         var time = weather.hours[12].time;
+//         var airTemperature = Math.round(airTemperature);
+//         var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
+//         var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
+//         var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
+//         var swellDirection = (weather.hours[12].swellDirection[0].value).toFixed(1);
+//         var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
+//         var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
+
+//         var timeNow = new Date();
+
+//         console.log('Todays date: ' + timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
+
+// // Display time for tidal & temperature information
+
+//         var timeHour = ('0' + timeNow.getHours()).slice(-2);
+//         var timeMinutes = timeNow.getMinutes();
+
+// // Function to return Word Direction in Names:
+
+//         // function direction(value) {
+//         //     if (value >= 0 && value < 22.5 || value >=337.5) {
+//         //         return 'North';
+//         //     } else if (value >= 22.5 && value < 67.5) {
+//         //         return 'Northeast';
+//         //     } else if (value >= 67.5 && value < 112.5) {
+//         //         return 'East';
+//         //     } else if (value >= 112.5 && value < 157.5) {
+//         //         return 'Southeast';
+//         //     } else if (value >= 157.5 && value < 202.5) {
+//         //         return 'South';
+//         //     } else if (value >= 202.5 && value < 247.5) {
+//         //             return 'Southwest';
+//         //     } else if (value >= 247.5 && value <292.5) {
+//         //             return 'West';
+//         //     } else if (value >= 292.5 && value <337.5) {
+//         //             return 'Northwest';
+//         //     }
+//         // };
+
+// // Function that return degrees that fall withing range of word directions:
+
+//         function direction(value) {
+//             if (value >= 0 && value < 22.5 || value >=337.5) {
+//                 return 0;
+//             } else if (value >= 22.5 && value < 67.5) {
+//                 return 45;
+//             } else if (value >= 67.5 && value < 112.5) {
+//                 return 90;
+//             } else if (value >= 112.5 && value < 157.5) {
+//                 return 135;
+//             } else if (value >= 157.5 && value < 202.5) {
+//                 return 180;
+//             } else if (value >= 202.5 && value < 247.5) {
+//                     return 225;
+//             } else if (value >= 247.5 && value <292.5) {
+//                     return 270;
+//             } else if (value >= 292.5 && value <337.5) {
+//                     return 315;
+//             }
+//         };
+
+// // Wind types that usues the wind direction and surf spots pointing direction to determin tyoe of wind for location
+
+//         // var wind = direction(windDirection);
+//         var wind = direction(windDirection);
+//         var point = surfSpot.point;
+
+//         console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
+
+//         // var North = 0;
+//         // var Northeast = 45;
+//         // var East = 90;
+//         // var Southeast = 135;
+//         // var South = 180;
+//         // var Southwest = 225;
+//         // var West = 270;
+//         // var Northwest = 315;
+
+//         var range = [wind, point];
+
+//         console.log('An Array of wind & point direction values: ' + range);
+        
+//         function check() {
+//             if ((wind - point) === 0) {
+//               return 'Offshore';
+//             } else if (
+//               (range[0] === 0) && (range[1] === 180) ||
+//               (range[0] === 180) && (range[1] === 0) ||
+//               (range[0] === 90) && (range[1] === 270) ||
+//               (range[0] === 270) && (range[1] === 90) ||
+//               (range[0] === 45) && (range[1] === 225) ||
+//               (range[0] === 225) && (range[1] === 45) ||
+//               (range[0] === 135) && (range[1] === 315) ||
+//               (range[0] === 315) && (range[1] === 135)) {
+//               return 'Onshore';
+//             } else {
+//               return 'Crosswind';
+//             }
+//           }
+        
+//         console.log('Type of wind result is: ' + check());
+
+
+// // Alternative simpler solution:
+
+// // function checkDirection(wind, point) {
+    
+// //     let direction;
+// //     let array = [[0, 180],[45, 225],[90, 270],[135, 315]];
+    
+// //     if (wind - point === 0) return 'Offshore';
+
+// //     array.forEach( arr => {
+// //         if (arr.includes(wind) && arr.includes(point)) {
+// //             return direction =  true;
+// //         }
+// //     });
+
+// //     return direction ? 'Onshore' : 'Crosswind';
+// // }
+// // console.log(checkDirection(45, 225))
+
+// // OUTPUT 1 - As per API requested time
+
+//         output += '<div>' +
+//             '<ul>' +
+//                 '<li>Today is: '+timeNow+'</li>'+
+//                 '<li>Surf Spot: '+surfSpot.title+'</li>' +
+//                 '<br>' +
+//                 '<li>Date & Time of the Forecast: '+time+'</li>' +
+//                 '<br>' +
+//                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+//                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+//                 '<br>' +
+//                 '<li>Wave Height: '+waveHeight+' m</li>' +
+//                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+//                 '<br>' +
+//                 '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+//                 '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+//                 '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+//                 '<li>Wind Direction from: '+windDirection+'</li>' +
+//                 '<li>Wind: '+range+' '+check()+'</li>' +
+//                 '<br>' +
+//                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+//             '</ul>'
+
+//             document.getElementById('data02').innerHTML = output;
+
+// // OUTPUT 2 NOW
+
+//         var outputtwo = '';
+
+//         // Time NOW
+
+//         var timeNow = new Date();
+//         // var timeNowHour = timeNow.getHours();
+
+//         var timeNowHour = 13;
+
+//         console.log('Current time (Hour): ' + timeNowHour);
+
+//         // UTC time to Hour and Minutes + Check the current Hour and provide data for that Time
+
+//         var timeWeather = new Date(weather.hours[timeNowHour].time);
+//         var timeWeatherHour = timeWeather.getUTCHours();
+
+//         console.log('Time from API (Hour): ' + timeWeatherHour);
+
+//         var dataNow = weather.hours[timeNowHour];
+
+//         var airTemperature = Math.round(dataNow.airTemperature[0].value);
+//         var waterTemperature = Math.round(dataNow.waterTemperature[0].value);
+//         var waveHeight = (dataNow.waveHeight[0].value).toFixed(1);
+//         var wavePeriod = Math.round(dataNow.wavePeriod[0].value);
+//         var swellDirection = (dataNow.swellDirection[0].value).toFixed(1);
+//         var windDirection = (dataNow.windDirection[0].value).toFixed(1);
+//         var windSpeed = Math.round(dataNow.windSpeed[0].value);
+
+//         outputtwo += '<div>' +
+//             '<ul>' +
+//                 '<li>Today is: '+timeNow+'</li>'+
+//                 '<li>Surf Spot: '+surfSpot.title+'</li>' +
+//                 '<br>' +
+//                 '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+//                 '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+//                 '<br>' +
+//                 '<li>Wave Height: '+waveHeight+' m</li>' +
+//                 '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+//                 '<br>' +
+//                 // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+//                 // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+//                 // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+//                 '<li>Wind: '+range+' '+check()+'</li>' +
+//                 // '<br>' +
+//                 '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+//             '</ul>'
+
+//             document.getElementById('data04').innerHTML = outputtwo;
+
+
+// // OUTPUT 3
+
+// var outputthree = '';
+
+// var dataNow = weather.hours[timeNowHour];
+
+// var airTemperature0 = Math.round(weather.hours[0].airTemperature[0].value);
+// var airTemperature1 = Math.round(weather.hours[2].airTemperature[0].value);
+// var airTemperature2 = Math.round(weather.hours[4].airTemperature[0].value);
+// var airTemperature3 = Math.round(weather.hours[6].airTemperature[0].value);
+// var airTemperature4 = Math.round(weather.hours[8].airTemperature[0].value);
+// var airTemperature5 = Math.round(weather.hours[10].airTemperature[0].value);
+// var airTemperature6 = Math.round(weather.hours[12].airTemperature[0].value);
+// var airTemperature7 = Math.round(weather.hours[14].airTemperature[0].value);
+// var airTemperature8 = Math.round(weather.hours[16].airTemperature[0].value);
+// var airTemperature9 = Math.round(weather.hours[18].airTemperature[0].value);
+// var airTemperature10 = Math.round(weather.hours[20].airTemperature[0].value);
+// var airTemperature11 = Math.round(weather.hours[22].airTemperature[0].value);
+// var airTemperature12 = Math.round(weather.hours[23].airTemperature[0].value);
+// var waterTemperature1 = Math.round(weather.hours[0].waterTemperature[0].value);
+// var waterTemperature2 = Math.round(weather.hours[2].waterTemperature[0].value);
+// var waterTemperature3 = Math.round(weather.hours[4].waterTemperature[0].value);
+// var waterTemperature4 = Math.round(weather.hours[6].waterTemperature[0].value);
+// var waterTemperature5 = Math.round(weather.hours[8].waterTemperature[0].value);
+// var waterTemperature6 = Math.round(weather.hours[10].waterTemperature[0].value);
+// var waterTemperature7 = Math.round(weather.hours[12].waterTemperature[0].value);
+// var waterTemperature8 = Math.round(weather.hours[14].waterTemperature[0].value);
+// var waterTemperature9 = Math.round(weather.hours[16].waterTemperature[0].value);
+// var waterTemperature10 = Math.round(weather.hours[18].waterTemperature[0].value);
+// var waterTemperature11 = Math.round(weather.hours[20].waterTemperature[0].value);
+// var waterTemperature12 = Math.round(weather.hours[22].waterTemperature[0].value);
+
+// var waveHeight1 = (weather.hours[0].waveHeight[0].value).toFixed(1);
+// var waveHeight2 = (weather.hours[2].waveHeight[0].value).toFixed(1);
+// var waveHeight3 = (weather.hours[4].waveHeight[0].value).toFixed(1);
+// var waveHeight4 = (weather.hours[6].waveHeight[0].value).toFixed(1);
+// var waveHeight5 = (weather.hours[8].waveHeight[0].value).toFixed(1);
+// var waveHeight6 = (weather.hours[10].waveHeight[0].value).toFixed(1);
+// var waveHeight7 = (weather.hours[12].waveHeight[0].value).toFixed(1);
+// var waveHeight8 = (weather.hours[14].waveHeight[0].value).toFixed(1);
+// var waveHeight9 = (weather.hours[16].waveHeight[0].value).toFixed(1);
+// var waveHeight10 = (weather.hours[18].waveHeight[0].value).toFixed(1);
+// var waveHeight11 = (weather.hours[20].waveHeight[0].value).toFixed(1);
+// var waveHeight12 = (weather.hours[22].waveHeight[0].value).toFixed(1);
+
+// var swellHeight1 = (weather.hours[0].swellHeight[0].value).toFixed(1);
+// var swellHeight2 = (weather.hours[2].swellHeight[0].value).toFixed(1);
+// var swellHeight3 = (weather.hours[4].swellHeight[0].value).toFixed(1);
+// var swellHeight4 = (weather.hours[6].swellHeight[0].value).toFixed(1);
+// var swellHeight5 = (weather.hours[8].swellHeight[0].value).toFixed(1);
+// var swellHeight6 = (weather.hours[10].swellHeight[0].value).toFixed(1);
+// var swellHeight7 = (weather.hours[12].swellHeight[0].value).toFixed(1);
+// var swellHeight8 = (weather.hours[14].swellHeight[0].value).toFixed(1);
+// var swellHeight9 = (weather.hours[16].swellHeight[0].value).toFixed(1);
+// var swellHeight10 = (weather.hours[18].swellHeight[0].value).toFixed(1);
+// var swellHeight11 = (weather.hours[20].swellHeight[0].value).toFixed(1);
+// var swellHeight12 = (weather.hours[22].swellHeight[0].value).toFixed(1);
+
+// var swellPeriod1 = (weather.hours[0].swellPeriod[0].value).toFixed(1);
+// var swellPeriod2 = (weather.hours[2].swellPeriod[0].value).toFixed(1);
+// var swellPeriod3 = (weather.hours[4].swellPeriod[0].value).toFixed(1);
+// var swellPeriod4 = (weather.hours[6].swellPeriod[0].value).toFixed(1);
+// var swellPeriod5 = (weather.hours[8].swellPeriod[0].value).toFixed(1);
+// var swellPeriod6 = (weather.hours[10].swellPeriod[0].value).toFixed(1);
+// var swellPeriod7 = (weather.hours[12].swellPeriod[0].value).toFixed(1);
+// var swellPeriod8 = (weather.hours[14].swellPeriod[0].value).toFixed(1);
+// var swellPeriod9 = (weather.hours[16].swellPeriod[0].value).toFixed(1);
+// var swellPeriod10 = (weather.hours[18].swellPeriod[0].value).toFixed(1);
+// var swellPeriod11 = (weather.hours[20].swellPeriod[0].value).toFixed(1);
+// var swellPeriod12 = (weather.hours[22].swellPeriod[0].value).toFixed(1);
+
+// var wavePeriod1 = Math.round(weather.hours[0].wavePeriod[0].value);
+// var wavePeriod2 = Math.round(weather.hours[2].wavePeriod[0].value);
+// var wavePeriod3 = Math.round(weather.hours[4].wavePeriod[0].value);
+// var wavePeriod4 = Math.round(weather.hours[6].wavePeriod[0].value);
+// var wavePeriod5 = Math.round(weather.hours[8].wavePeriod[0].value);
+// var wavePeriod6 = Math.round(weather.hours[10].wavePeriod[0].value);
+// var wavePeriod7 = Math.round(weather.hours[12].wavePeriod[0].value);
+// var wavePeriod8 = Math.round(weather.hours[14].wavePeriod[0].value);
+// var wavePeriod9 = Math.round(weather.hours[16].wavePeriod[0].value);
+// var wavePeriod10 = Math.round(weather.hours[18].wavePeriod[0].value);
+// var wavePeriod11 = Math.round(weather.hours[20].wavePeriod[0].value);
+// var wavePeriod12 = Math.round(weather.hours[22].wavePeriod[0].value);
+
+// var swellDirection1 = (weather.hours[0].swellDirection[0].value).toFixed(1);
+// var swellDirection2 = (weather.hours[4].swellDirection[0].value).toFixed(1);
+// var swellDirection3 = (weather.hours[8].swellDirection[0].value).toFixed(1);
+// var swellDirection4 = (weather.hours[12].swellDirection[0].value).toFixed(1);
+// var swellDirection5 = (weather.hours[18].swellDirection[0].value).toFixed(1);
+// var swellDirection6 = (weather.hours[22].swellDirection[0].value).toFixed(1);
+
+// var windDirection1 = (weather.hours[0].windDirection[0].value).toFixed(1);
+// var windDirection2 = (weather.hours[4].windDirection[0].value).toFixed(1);
+// var windDirection3 = (weather.hours[8].windDirection[0].value).toFixed(1);
+// var windDirection4 = (weather.hours[12].windDirection[0].value).toFixed(1);
+// var windDirection5 = (weather.hours[18].windDirection[0].value).toFixed(1);
+// var windDirection6 = (weather.hours[22].windDirection[0].value).toFixed(1);
+
+// // var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
+// var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
+
+//    outputthree += '<div>' +
+//         '<ul>' +
+//             '<li>Today is: '+timeNow+'</li>'+
+//             '<li>Surf Spot: '+surfSpot.title+'</li>' +
+//             '<br>' +
+//             '<li>Air Temperature: '+airTemperature0+' &#8451 | Water Temperature: '+waterTemperature1+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature1+' &#8451 | Water Temperature: '+waterTemperature2+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature2+' &#8451 | Water Temperature: '+waterTemperature3+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature3+' &#8451 | Water Temperature: '+waterTemperature4+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature4+' &#8451 | Water Temperature: '+waterTemperature5+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature5+' &#8451 | Water Temperature: '+waterTemperature6+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature6+' &#8451 | Water Temperature: '+waterTemperature7+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature7+' &#8451 | Water Temperature: '+waterTemperature8+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature8+' &#8451 | Water Temperature: '+waterTemperature9+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature9+' &#8451 | Water Temperature: '+waterTemperature10+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature10+' &#8451 | Water Temperature: '+waterTemperature11+' &#8451</li>' +
+//             '<li>Air Temperature: '+airTemperature11+' &#8451 | Water Temperature: '+waterTemperature12+' &#8451</li>' +
+//             '<br>' +
+//             '<li>Wave/Swell Height: '+waveHeight1+' / '+swellHeight1+'  m | Wave/Swell Period: '+wavePeriod1+' / '+swellPeriod1+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight2+' / '+swellHeight2+' m | Wave/Swell Period: '+wavePeriod2+' / '+swellPeriod2+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight3+' / '+swellHeight3+' m | Wave/Swell Period: '+wavePeriod3+' / '+swellPeriod3+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight4+' / '+swellHeight4+' m | Wave/Swell Period: '+wavePeriod4+' / '+swellPeriod4+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight5+' / '+swellHeight5+' m | Wave/Swell Period: '+wavePeriod5+' / '+swellPeriod5+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight6+' / '+swellHeight6+' m | Wave/Swell Period: '+wavePeriod6+' / '+swellPeriod6+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight7+' / '+swellHeight7+' m | Wave/Swell Period: '+wavePeriod7+' / '+swellPeriod7+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight8+' / '+swellHeight8+' m | Wave/Swell Period: '+wavePeriod8+' / '+swellPeriod8+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight9+' / '+swellHeight9+' m | Wave/Swell Period: '+wavePeriod9+' / '+swellPeriod9+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight10+' / '+swellHeight10+' m | Wave/Swell Period: '+wavePeriod10+' / '+swellPeriod10+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight11+' / '+swellHeight11+' m | Wave/Swell Period: '+wavePeriod11+' / '+swellPeriod11+' seconds</li>' +
+//             '<li>Wave/Swell Height: '+waveHeight12+' / '+swellHeight12+' m | Wave/Swell Period: '+wavePeriod12+' / '+swellPeriod12+' seconds</li>' +
+//             '<br>' +
+//             '<li>Swell Direction: '+swellDirection1+' | Wave Direction: '+windDirection1+' </li>' +
+//             '<li>Swell Direction: '+swellDirection2+' | Wave Direction: '+windDirection2+' </li>' +
+//             '<li>Swell Direction: '+swellDirection3+' | Wave Direction: '+windDirection3+' </li>' +
+//             '<li>Swell Direction: '+swellDirection4+' | Wave Direction: '+windDirection4+' </li>' +
+//             '<li>Swell Direction: '+swellDirection5+' | Wave Direction: '+windDirection5+' </li>' +
+//             '<li>Swell Direction: '+swellDirection6+' | Wave Direction: '+windDirection6+' </li>' +
+//             '<br>' +
+//             // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+//             // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+//             // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+//             '<li>Wind: '+range+' '+check()+'</li>' +
+//             '<br>' +
+//             '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+//         '</ul>'
+
+//         document.getElementById('data05').innerHTML = outputthree;
+
+// // OUTPUT 4 AVERAGES
+
+// // average from Sunrise till 11:00 | 11:00 till 14:00 | 14:00 till Sunset
+
+//         // var morning = [5,6,7,8,9,10];
+//         // var midday = [11,12,13,14];
+//         // var afternoon = [15,16,17,18,19,20];
+
+//         var outputfour = '';
+
+//         // this should be a function that when pass an argument it will throw a array with values for that
+//         // particular argument so function morning(parameter) { do sth }
+
+//         var morning = [weather.hours[5].airTemperature[0].value,
+//                         weather.hours[6].airTemperature[0].value,
+//                         weather.hours[7].airTemperature[0].value,
+//                         weather.hours[8].airTemperature[0].value,
+//                         weather.hours[9].airTemperature[0].value,
+//                         weather.hours[10].airTemperature[0].value];
+
+//         var midday = [weather.hours[11].airTemperature[0].value,
+//                         weather.hours[12].airTemperature[0].value,
+//                         weather.hours[13].airTemperature[0].value,
+//                         weather.hours[14].airTemperature[0].value];
+
+//         var afternoon = [weather.hours[15].airTemperature[0].value,
+//                             weather.hours[16].airTemperature[0].value,
+//                             weather.hours[17].airTemperature[0].value,
+//                             weather.hours[18].airTemperature[0].value,
+//                             weather.hours[19].airTemperature[0].value,
+//                             weather.hours[20].airTemperature[0].value];
+
+// // OPTION 1
+
+// var waveHeight = 'waveHeight[0].value';
+// var wavePeriod = 'wavePeriod[0].value';
+// var windDirection = 'windDirection[0].value';
+// var windSpeed = 'windSpeed[0].value';
+// var airTemperature = '.airTemperature[0].value';
+// var waterTemperature = '.waterTemperature[0].value';
+// var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
+
+// var morning = [5, 6, 7, 8, 9, 10];
+// var midday = [11,12,13,14];
+// var afternoon = [15, 16, 17, 18, 19, 20];
+// var dayTime = [];
+
+// var timeType = function(time, type) {
+// time.forEach(function(item) {
+//     dayTime.push('weather.hours['+item+']');
+// });
+// var mapping = dayTime.map(function (num) {
+//     return num+type;
 // });
 
-var morningAv = Math.round(total / morning.length) 
+// //   for (var i = 0; i < mapping.length; i++) {
+// //     mapping[i] = mapping[i].replace(/"/g,'');
+// //   };
 
-console.log(morningAv);
-
-
-
-        // DATA
-
-        var output = '';
-
-// getting an average values for data values with several sources
-// maybe stick to the first source i.e. SG as it is the most frequent and first in all data
-// NOT REQUIRED ANYMORE
-
-        // var total = 0;
-        // var length = 0;
-
-        // for (var v in weather.hours[12].airTemperature) {
-        //     total += weather.hours[12].airTemperature[v].value;
-        //     length++;
-        // };
-
-        // var averageAirTemp = total / length;
-
-        // console.log('Average Air Temperature: ' +averageAirTemp);
-
-// Data break down into types and values:
-
-        var time = weather.hours[12].time;
-        var airTemperature = Math.round(airTemperature);
-        var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
-        var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
-        var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
-        var swellDirection = (weather.hours[12].swellDirection[0].value).toFixed(1);
-        var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
-        var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
-
-        var timeNow = new Date();
-
-        console.log('Todays date: ' + timeNow.getFullYear() + '.' + timeNow.getMonth() + '.' + timeNow.getDate());
-
-// Display time for tidal & temperature information
-
-        var timeHour = ('0' + timeNow.getHours()).slice(-2);
-        var timeMinutes = timeNow.getMinutes();
-
-// Function to return Word Direction in Names:
-
-        // function direction(value) {
-        //     if (value >= 0 && value < 22.5 || value >=337.5) {
-        //         return 'North';
-        //     } else if (value >= 22.5 && value < 67.5) {
-        //         return 'Northeast';
-        //     } else if (value >= 67.5 && value < 112.5) {
-        //         return 'East';
-        //     } else if (value >= 112.5 && value < 157.5) {
-        //         return 'Southeast';
-        //     } else if (value >= 157.5 && value < 202.5) {
-        //         return 'South';
-        //     } else if (value >= 202.5 && value < 247.5) {
-        //             return 'Southwest';
-        //     } else if (value >= 247.5 && value <292.5) {
-        //             return 'West';
-        //     } else if (value >= 292.5 && value <337.5) {
-        //             return 'Northwest';
-        //     }
-        // };
-
-// Function that return degrees that fall withing range of word directions:
-
-        function direction(value) {
-            if (value >= 0 && value < 22.5 || value >=337.5) {
-                return 0;
-            } else if (value >= 22.5 && value < 67.5) {
-                return 45;
-            } else if (value >= 67.5 && value < 112.5) {
-                return 90;
-            } else if (value >= 112.5 && value < 157.5) {
-                return 135;
-            } else if (value >= 157.5 && value < 202.5) {
-                return 180;
-            } else if (value >= 202.5 && value < 247.5) {
-                    return 225;
-            } else if (value >= 247.5 && value <292.5) {
-                    return 270;
-            } else if (value >= 292.5 && value <337.5) {
-                    return 315;
-            }
-        };
-
-// Wind types that usues the wind direction and surf spots pointing direction to determin tyoe of wind for location
-
-        // var wind = direction(windDirection);
-        var wind = direction(windDirection);
-        var point = surfSpot.point;
-
-        console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
-
-        // var North = 0;
-        // var Northeast = 45;
-        // var East = 90;
-        // var Southeast = 135;
-        // var South = 180;
-        // var Southwest = 225;
-        // var West = 270;
-        // var Northwest = 315;
-
-        var range = [wind, point];
-
-        console.log('An Array of wind & point direction values: ' + range);
-        
-        function check() {
-            if ((wind - point) === 0) {
-              return 'Offshore';
-            } else if (
-              (range[0] === 0) && (range[1] === 180) ||
-              (range[0] === 180) && (range[1] === 0) ||
-              (range[0] === 90) && (range[1] === 270) ||
-              (range[0] === 270) && (range[1] === 90) ||
-              (range[0] === 45) && (range[1] === 225) ||
-              (range[0] === 225) && (range[1] === 45) ||
-              (range[0] === 135) && (range[1] === 315) ||
-              (range[0] === 315) && (range[1] === 135)) {
-              return 'Onshore';
-            } else {
-              return 'Crosswind';
-            }
-          }
-        
-        console.log('Type of wind result is: ' + check());
-
-
-// Alternative simpler solution:
-
-// function checkDirection(wind, point) {
-    
-//     let direction;
-//     let array = [[0, 180],[45, 225],[90, 270],[135, 315]];
-    
-//     if (wind - point === 0) return 'Offshore';
-
-//     array.forEach( arr => {
-//         if (arr.includes(wind) && arr.includes(point)) {
-//             return direction =  true;
-//         }
-//     });
-
-//     return direction ? 'Onshore' : 'Crosswind';
+// return mapping
 // }
-// console.log(checkDirection(45, 225))
-
-// OUTPUT 1 - As per API requested time
-
-        output += '<div>' +
-            '<ul>' +
-                '<li>Today is: '+timeNow+'</li>'+
-                '<li>Surf Spot: '+surfSpot.title+'</li>' +
-                '<br>' +
-                '<li>Date & Time of the Forecast: '+time+'</li>' +
-                '<br>' +
-                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
-                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
-                '<br>' +
-                '<li>Wave Height: '+waveHeight+' m</li>' +
-                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
-                '<br>' +
-                '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
-                '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-                '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
-                '<li>Wind Direction from: '+windDirection+'</li>' +
-                '<li>Wind: '+range+' '+check()+'</li>' +
-                '<br>' +
-                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
-            '</ul>'
-
-            document.getElementById('data02').innerHTML = output;
-
-// OUTPUT 2 NOW
-
-        var outputtwo = '';
-
-        // Time NOW
-
-        var timeNow = new Date();
-        // var timeNowHour = timeNow.getHours();
-
-        var timeNowHour = 13;
-
-        console.log('Current time (Hour): ' + timeNowHour);
-
-        // UTC time to Hour and Minutes + Check the current Hour and provide data for that Time
-
-        var timeWeather = new Date(weather.hours[timeNowHour].time);
-        var timeWeatherHour = timeWeather.getUTCHours();
-
-        console.log('Time from API (Hour): ' + timeWeatherHour);
-
-        var dataNow = weather.hours[timeNowHour];
-
-        var airTemperature = Math.round(dataNow.airTemperature[0].value);
-        var waterTemperature = Math.round(dataNow.waterTemperature[0].value);
-        var waveHeight = (dataNow.waveHeight[0].value).toFixed(1);
-        var wavePeriod = Math.round(dataNow.wavePeriod[0].value);
-        var swellDirection = (dataNow.swellDirection[0].value).toFixed(1);
-        var windDirection = (dataNow.windDirection[0].value).toFixed(1);
-        var windSpeed = Math.round(dataNow.windSpeed[0].value);
-
-        outputtwo += '<div>' +
-            '<ul>' +
-                '<li>Today is: '+timeNow+'</li>'+
-                '<li>Surf Spot: '+surfSpot.title+'</li>' +
-                '<br>' +
-                '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
-                '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
-                '<br>' +
-                '<li>Wave Height: '+waveHeight+' m</li>' +
-                '<li>Wave Period: '+wavePeriod+' seconds</li>' +
-                '<br>' +
-                // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
-                // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-                // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
-                '<li>Wind: '+range+' '+check()+'</li>' +
-                // '<br>' +
-                '<li>Wind Speed: '+windSpeed+' m/second</li>' +
-            '</ul>'
-
-            document.getElementById('data04').innerHTML = outputtwo;
-
-
-// OUTPUT 3
-
-var outputthree = '';
-
-var dataNow = weather.hours[timeNowHour];
-
-var airTemperature0 = Math.round(weather.hours[0].airTemperature[0].value);
-var airTemperature1 = Math.round(weather.hours[2].airTemperature[0].value);
-var airTemperature2 = Math.round(weather.hours[4].airTemperature[0].value);
-var airTemperature3 = Math.round(weather.hours[6].airTemperature[0].value);
-var airTemperature4 = Math.round(weather.hours[8].airTemperature[0].value);
-var airTemperature5 = Math.round(weather.hours[10].airTemperature[0].value);
-var airTemperature6 = Math.round(weather.hours[12].airTemperature[0].value);
-var airTemperature7 = Math.round(weather.hours[14].airTemperature[0].value);
-var airTemperature8 = Math.round(weather.hours[16].airTemperature[0].value);
-var airTemperature9 = Math.round(weather.hours[18].airTemperature[0].value);
-var airTemperature10 = Math.round(weather.hours[20].airTemperature[0].value);
-var airTemperature11 = Math.round(weather.hours[22].airTemperature[0].value);
-var airTemperature12 = Math.round(weather.hours[23].airTemperature[0].value);
-var waterTemperature1 = Math.round(weather.hours[0].waterTemperature[0].value);
-var waterTemperature2 = Math.round(weather.hours[2].waterTemperature[0].value);
-var waterTemperature3 = Math.round(weather.hours[4].waterTemperature[0].value);
-var waterTemperature4 = Math.round(weather.hours[6].waterTemperature[0].value);
-var waterTemperature5 = Math.round(weather.hours[8].waterTemperature[0].value);
-var waterTemperature6 = Math.round(weather.hours[10].waterTemperature[0].value);
-var waterTemperature7 = Math.round(weather.hours[12].waterTemperature[0].value);
-var waterTemperature8 = Math.round(weather.hours[14].waterTemperature[0].value);
-var waterTemperature9 = Math.round(weather.hours[16].waterTemperature[0].value);
-var waterTemperature10 = Math.round(weather.hours[18].waterTemperature[0].value);
-var waterTemperature11 = Math.round(weather.hours[20].waterTemperature[0].value);
-var waterTemperature12 = Math.round(weather.hours[22].waterTemperature[0].value);
-
-var waveHeight1 = (weather.hours[0].waveHeight[0].value).toFixed(1);
-var waveHeight2 = (weather.hours[2].waveHeight[0].value).toFixed(1);
-var waveHeight3 = (weather.hours[4].waveHeight[0].value).toFixed(1);
-var waveHeight4 = (weather.hours[6].waveHeight[0].value).toFixed(1);
-var waveHeight5 = (weather.hours[8].waveHeight[0].value).toFixed(1);
-var waveHeight6 = (weather.hours[10].waveHeight[0].value).toFixed(1);
-var waveHeight7 = (weather.hours[12].waveHeight[0].value).toFixed(1);
-var waveHeight8 = (weather.hours[14].waveHeight[0].value).toFixed(1);
-var waveHeight9 = (weather.hours[16].waveHeight[0].value).toFixed(1);
-var waveHeight10 = (weather.hours[18].waveHeight[0].value).toFixed(1);
-var waveHeight11 = (weather.hours[20].waveHeight[0].value).toFixed(1);
-var waveHeight12 = (weather.hours[22].waveHeight[0].value).toFixed(1);
-
-var swellHeight1 = (weather.hours[0].swellHeight[0].value).toFixed(1);
-var swellHeight2 = (weather.hours[2].swellHeight[0].value).toFixed(1);
-var swellHeight3 = (weather.hours[4].swellHeight[0].value).toFixed(1);
-var swellHeight4 = (weather.hours[6].swellHeight[0].value).toFixed(1);
-var swellHeight5 = (weather.hours[8].swellHeight[0].value).toFixed(1);
-var swellHeight6 = (weather.hours[10].swellHeight[0].value).toFixed(1);
-var swellHeight7 = (weather.hours[12].swellHeight[0].value).toFixed(1);
-var swellHeight8 = (weather.hours[14].swellHeight[0].value).toFixed(1);
-var swellHeight9 = (weather.hours[16].swellHeight[0].value).toFixed(1);
-var swellHeight10 = (weather.hours[18].swellHeight[0].value).toFixed(1);
-var swellHeight11 = (weather.hours[20].swellHeight[0].value).toFixed(1);
-var swellHeight12 = (weather.hours[22].swellHeight[0].value).toFixed(1);
-
-var swellPeriod1 = (weather.hours[0].swellPeriod[0].value).toFixed(1);
-var swellPeriod2 = (weather.hours[2].swellPeriod[0].value).toFixed(1);
-var swellPeriod3 = (weather.hours[4].swellPeriod[0].value).toFixed(1);
-var swellPeriod4 = (weather.hours[6].swellPeriod[0].value).toFixed(1);
-var swellPeriod5 = (weather.hours[8].swellPeriod[0].value).toFixed(1);
-var swellPeriod6 = (weather.hours[10].swellPeriod[0].value).toFixed(1);
-var swellPeriod7 = (weather.hours[12].swellPeriod[0].value).toFixed(1);
-var swellPeriod8 = (weather.hours[14].swellPeriod[0].value).toFixed(1);
-var swellPeriod9 = (weather.hours[16].swellPeriod[0].value).toFixed(1);
-var swellPeriod10 = (weather.hours[18].swellPeriod[0].value).toFixed(1);
-var swellPeriod11 = (weather.hours[20].swellPeriod[0].value).toFixed(1);
-var swellPeriod12 = (weather.hours[22].swellPeriod[0].value).toFixed(1);
-
-var wavePeriod1 = Math.round(weather.hours[0].wavePeriod[0].value);
-var wavePeriod2 = Math.round(weather.hours[2].wavePeriod[0].value);
-var wavePeriod3 = Math.round(weather.hours[4].wavePeriod[0].value);
-var wavePeriod4 = Math.round(weather.hours[6].wavePeriod[0].value);
-var wavePeriod5 = Math.round(weather.hours[8].wavePeriod[0].value);
-var wavePeriod6 = Math.round(weather.hours[10].wavePeriod[0].value);
-var wavePeriod7 = Math.round(weather.hours[12].wavePeriod[0].value);
-var wavePeriod8 = Math.round(weather.hours[14].wavePeriod[0].value);
-var wavePeriod9 = Math.round(weather.hours[16].wavePeriod[0].value);
-var wavePeriod10 = Math.round(weather.hours[18].wavePeriod[0].value);
-var wavePeriod11 = Math.round(weather.hours[20].wavePeriod[0].value);
-var wavePeriod12 = Math.round(weather.hours[22].wavePeriod[0].value);
-
-var swellDirection1 = (weather.hours[0].swellDirection[0].value).toFixed(1);
-var swellDirection2 = (weather.hours[4].swellDirection[0].value).toFixed(1);
-var swellDirection3 = (weather.hours[8].swellDirection[0].value).toFixed(1);
-var swellDirection4 = (weather.hours[12].swellDirection[0].value).toFixed(1);
-var swellDirection5 = (weather.hours[18].swellDirection[0].value).toFixed(1);
-var swellDirection6 = (weather.hours[22].swellDirection[0].value).toFixed(1);
-
-var windDirection1 = (weather.hours[0].windDirection[0].value).toFixed(1);
-var windDirection2 = (weather.hours[4].windDirection[0].value).toFixed(1);
-var windDirection3 = (weather.hours[8].windDirection[0].value).toFixed(1);
-var windDirection4 = (weather.hours[12].windDirection[0].value).toFixed(1);
-var windDirection5 = (weather.hours[18].windDirection[0].value).toFixed(1);
-var windDirection6 = (weather.hours[22].windDirection[0].value).toFixed(1);
-
-// var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
-var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
-
-   outputthree += '<div>' +
-        '<ul>' +
-            '<li>Today is: '+timeNow+'</li>'+
-            '<li>Surf Spot: '+surfSpot.title+'</li>' +
-            '<br>' +
-            '<li>Air Temperature: '+airTemperature0+' &#8451 | Water Temperature: '+waterTemperature1+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature1+' &#8451 | Water Temperature: '+waterTemperature2+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature2+' &#8451 | Water Temperature: '+waterTemperature3+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature3+' &#8451 | Water Temperature: '+waterTemperature4+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature4+' &#8451 | Water Temperature: '+waterTemperature5+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature5+' &#8451 | Water Temperature: '+waterTemperature6+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature6+' &#8451 | Water Temperature: '+waterTemperature7+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature7+' &#8451 | Water Temperature: '+waterTemperature8+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature8+' &#8451 | Water Temperature: '+waterTemperature9+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature9+' &#8451 | Water Temperature: '+waterTemperature10+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature10+' &#8451 | Water Temperature: '+waterTemperature11+' &#8451</li>' +
-            '<li>Air Temperature: '+airTemperature11+' &#8451 | Water Temperature: '+waterTemperature12+' &#8451</li>' +
-            '<br>' +
-            '<li>Wave/Swell Height: '+waveHeight1+' / '+swellHeight1+'  m | Wave/Swell Period: '+wavePeriod1+' / '+swellPeriod1+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight2+' / '+swellHeight2+' m | Wave/Swell Period: '+wavePeriod2+' / '+swellPeriod2+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight3+' / '+swellHeight3+' m | Wave/Swell Period: '+wavePeriod3+' / '+swellPeriod3+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight4+' / '+swellHeight4+' m | Wave/Swell Period: '+wavePeriod4+' / '+swellPeriod4+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight5+' / '+swellHeight5+' m | Wave/Swell Period: '+wavePeriod5+' / '+swellPeriod5+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight6+' / '+swellHeight6+' m | Wave/Swell Period: '+wavePeriod6+' / '+swellPeriod6+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight7+' / '+swellHeight7+' m | Wave/Swell Period: '+wavePeriod7+' / '+swellPeriod7+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight8+' / '+swellHeight8+' m | Wave/Swell Period: '+wavePeriod8+' / '+swellPeriod8+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight9+' / '+swellHeight9+' m | Wave/Swell Period: '+wavePeriod9+' / '+swellPeriod9+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight10+' / '+swellHeight10+' m | Wave/Swell Period: '+wavePeriod10+' / '+swellPeriod10+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight11+' / '+swellHeight11+' m | Wave/Swell Period: '+wavePeriod11+' / '+swellPeriod11+' seconds</li>' +
-            '<li>Wave/Swell Height: '+waveHeight12+' / '+swellHeight12+' m | Wave/Swell Period: '+wavePeriod12+' / '+swellPeriod12+' seconds</li>' +
-            '<br>' +
-            '<li>Swell Direction: '+swellDirection1+' | Wave Direction: '+windDirection1+' </li>' +
-            '<li>Swell Direction: '+swellDirection2+' | Wave Direction: '+windDirection2+' </li>' +
-            '<li>Swell Direction: '+swellDirection3+' | Wave Direction: '+windDirection3+' </li>' +
-            '<li>Swell Direction: '+swellDirection4+' | Wave Direction: '+windDirection4+' </li>' +
-            '<li>Swell Direction: '+swellDirection5+' | Wave Direction: '+windDirection5+' </li>' +
-            '<li>Swell Direction: '+swellDirection6+' | Wave Direction: '+windDirection6+' </li>' +
-            '<br>' +
-            // '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
-            // '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-            // '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
-            '<li>Wind: '+range+' '+check()+'</li>' +
-            '<br>' +
-            '<li>Wind Speed: '+windSpeed+' m/second</li>' +
-        '</ul>'
-
-        document.getElementById('data05').innerHTML = outputthree;
-
-// OUTPUT 4 AVERAGES
-
-// average from Sunrise till 11:00 | 11:00 till 14:00 | 14:00 till Sunset
-
-        // var morning = [5,6,7,8,9,10];
-        // var midday = [11,12,13,14];
-        // var afternoon = [15,16,17,18,19,20];
-
-        var outputfour = '';
-
-        // this should be a function that when pass an argument it will throw a array with values for that
-        // particular argument so function morning(parameter) { do sth }
-
-        var morning = [weather.hours[5].airTemperature[0].value,
-                        weather.hours[6].airTemperature[0].value,
-                        weather.hours[7].airTemperature[0].value,
-                        weather.hours[8].airTemperature[0].value,
-                        weather.hours[9].airTemperature[0].value,
-                        weather.hours[10].airTemperature[0].value];
-
-        var midday = [weather.hours[11].airTemperature[0].value,
-                        weather.hours[12].airTemperature[0].value,
-                        weather.hours[13].airTemperature[0].value,
-                        weather.hours[14].airTemperature[0].value];
-
-        var afternoon = [weather.hours[15].airTemperature[0].value,
-                            weather.hours[16].airTemperature[0].value,
-                            weather.hours[17].airTemperature[0].value,
-                            weather.hours[18].airTemperature[0].value,
-                            weather.hours[19].airTemperature[0].value,
-                            weather.hours[20].airTemperature[0].value];
-
-// OPTION 1
-
-var waveHeight = 'waveHeight[0].value';
-var wavePeriod = 'wavePeriod[0].value';
-var windDirection = 'windDirection[0].value';
-var windSpeed = 'windSpeed[0].value';
-var airTemperature = '.airTemperature[0].value';
-var waterTemperature = '.waterTemperature[0].value';
-var parameters = [waveHeight, wavePeriod, windDirection, windSpeed, airTemperature, waterTemperature];
-
-var morning = [5, 6, 7, 8, 9, 10];
-var midday = [11,12,13,14];
-var afternoon = [15, 16, 17, 18, 19, 20];
-var dayTime = [];
-
-var timeType = function(time, type) {
-time.forEach(function(item) {
-    dayTime.push('weather.hours['+item+']');
-});
-var mapping = dayTime.map(function (num) {
-    return num+type;
-});
-
-//   for (var i = 0; i < mapping.length; i++) {
-//     mapping[i] = mapping[i].replace(/"/g,'');
-//   };
-
-return mapping
-}
-
-// console.log(timeType(midday, parameters[1]));
-
-// console.log(timeType(afternoon, parameters[0]));
-
-
-// Part 1 - This function give us the array of data for particular day
-
-                    // var morning = [5, 6, 7, 8, 9, 10];
-                    // var morningAv = [];
-
-                    // morning.forEach(function(item) {
-                    //   morningAv.push('weather.hour['+item+']'+parameters[0]);
-                    // });
-
-                    // console.log(morningAv);
-
-                    // var midday = [11,12,13,14];
-                    // var middayAv = [];
-
-                    // midday.forEach(function(item) {
-                    //   middayAv.push('weather.hour['+item+']'+parameters[1]);
-                    // });
-
-                    // console.log(middayAv);
-
-                    // var afternoon = [15, 16, 17, 18, 19, 20];
-                    // var afternoonAv = [];
-
-                    // afternoon.forEach(function(item) {
-                    //   afternoonAv.push('weather.hour['+item+']'+airTemperature);
-                    // });
-
-                    // console.log(afternoonAv);
-
-// Part 2 = the actual calculations
-
-        var morningSum = (timeType(morning, parameters[0])).reduce(function (accumulator, currentValue) {
-            return accumulator + currentValue;
-          }, 0);
-
-        var morningAv = Math.round(morningSum / (timeType(morning, parameters[0])).length);
-
-        // console.log(typeof(morningAv));
-        //   console.log(morningAv);
-
-        //   var middaySum = midday.reduce(function (accumulator, currentValue) {
-        //     return accumulator + currentValue;
-        //   }, 0);
-
-        // var middayAv = Math.round(middaySum / midday.length);
-
-        //   console.log(middayAv);
-
-        //   var afternoonSum = afternoon.reduce(function (accumulator, currentValue) {
-        //     return accumulator + currentValue;
-        //   }, 0);
-
-        // var afternoonAv = Math.round(afternoonSum / afternoon.length);
-
-        //   console.log(afternoonAv);
-
-                            // var airTemperature = '.airTemperature[0].value';
-                            // var waterTemperature = '.waterTemperature[0].value';
-
-                            // var morning = 'weather.hours[5]';
-                            // var morning = [5, 7, 8, 9, 10];
-
-                            // var dayTime = morning.forEach(function(element) {
-                            //     return weather.hours[element];
-                            //     });
-
-                            // console.log(dayTime);
-
-                            // function averageData(parameter, dayTime) {
-                            //     dayTime.forEach(function(item) {
-                            //         return dayTime+parameter;
-                            //     })
+
+// // console.log(timeType(midday, parameters[1]));
+
+// // console.log(timeType(afternoon, parameters[0]));
+
+
+// // Part 1 - This function give us the array of data for particular day
+
+//                     // var morning = [5, 6, 7, 8, 9, 10];
+//                     // var morningAv = [];
+
+//                     // morning.forEach(function(item) {
+//                     //   morningAv.push('weather.hour['+item+']'+parameters[0]);
+//                     // });
+
+//                     // console.log(morningAv);
+
+//                     // var midday = [11,12,13,14];
+//                     // var middayAv = [];
+
+//                     // midday.forEach(function(item) {
+//                     //   middayAv.push('weather.hour['+item+']'+parameters[1]);
+//                     // });
+
+//                     // console.log(middayAv);
+
+//                     // var afternoon = [15, 16, 17, 18, 19, 20];
+//                     // var afternoonAv = [];
+
+//                     // afternoon.forEach(function(item) {
+//                     //   afternoonAv.push('weather.hour['+item+']'+airTemperature);
+//                     // });
+
+//                     // console.log(afternoonAv);
+
+// // Part 2 = the actual calculations
+
+//         var morningSum = (timeType(morning, parameters[0])).reduce(function (accumulator, currentValue) {
+//             return accumulator + currentValue;
+//           }, 0);
+
+//         var morningAv = Math.round(morningSum / (timeType(morning, parameters[0])).length);
+
+//         // console.log(typeof(morningAv));
+//         //   console.log(morningAv);
+
+//         //   var middaySum = midday.reduce(function (accumulator, currentValue) {
+//         //     return accumulator + currentValue;
+//         //   }, 0);
+
+//         // var middayAv = Math.round(middaySum / midday.length);
+
+//         //   console.log(middayAv);
+
+//         //   var afternoonSum = afternoon.reduce(function (accumulator, currentValue) {
+//         //     return accumulator + currentValue;
+//         //   }, 0);
+
+//         // var afternoonAv = Math.round(afternoonSum / afternoon.length);
+
+//         //   console.log(afternoonAv);
+
+//                             // var airTemperature = '.airTemperature[0].value';
+//                             // var waterTemperature = '.waterTemperature[0].value';
+
+//                             // var morning = 'weather.hours[5]';
+//                             // var morning = [5, 7, 8, 9, 10];
+
+//                             // var dayTime = morning.forEach(function(element) {
+//                             //     return weather.hours[element];
+//                             //     });
+
+//                             // console.log(dayTime);
+
+//                             // function averageData(parameter, dayTime) {
+//                             //     dayTime.forEach(function(item) {
+//                             //         return dayTime+parameter;
+//                             //     })
                                 
 
-                            // };
+//                             // };
 
-                            // console.log(averageData(waterTemperature, morning));
+//                             // console.log(averageData(waterTemperature, morning));
 
-        //   outputfour += '<div>' +
-        //     '<h1>Day Forecast</h1>' +
-        //     '<h2>Morning</h2>' +
-        //     '<h3>Wave</h3>' +
-        //     '<p>Height: '+timeType(morning, parameter[0])+'</p>' +
-        //     '<p>Period: '+timeType(morning, parameter[1])+'</p>' +
-        //     '<h2>Midday</h2>' +
-        //     '<h3>Wave</h3>' +
-        //     '<p>Height: '+timeType(midday, parameter[0])+'</p>' +
-        //     '<p>Period: '+timeType(midday, parameter[1])+'</p>' +
-        //     '<h2>Afternoon</h2>' +
-        //     '<h3>Wave</h3>' +
-        //     '<p>Height: '+timeType(afternoon, parameter[0])+'</p>' +
-        //     '<p>Period: '+timeType(afternoon, parameter[1])+'</p>'
+//         //   outputfour += '<div>' +
+//         //     '<h1>Day Forecast</h1>' +
+//         //     '<h2>Morning</h2>' +
+//         //     '<h3>Wave</h3>' +
+//         //     '<p>Height: '+timeType(morning, parameter[0])+'</p>' +
+//         //     '<p>Period: '+timeType(morning, parameter[1])+'</p>' +
+//         //     '<h2>Midday</h2>' +
+//         //     '<h3>Wave</h3>' +
+//         //     '<p>Height: '+timeType(midday, parameter[0])+'</p>' +
+//         //     '<p>Period: '+timeType(midday, parameter[1])+'</p>' +
+//         //     '<h2>Afternoon</h2>' +
+//         //     '<h3>Wave</h3>' +
+//         //     '<p>Height: '+timeType(afternoon, parameter[0])+'</p>' +
+//         //     '<p>Period: '+timeType(afternoon, parameter[1])+'</p>'
 
-        //     console.log(timeType(afternoon, parameter[0]));
+//         //     console.log(timeType(afternoon, parameter[0]));
 
-        //   document.getElementById('data06').innerHTML = outputfour;
+//         //   document.getElementById('data06').innerHTML = outputfour;
 
 
     } else if (this.readyState == 4 && this.status == 402) {
@@ -835,7 +878,7 @@ xhr.onerror = function() {
     console.log('Request error: ');
 };
 
-xhr.send();
+// xhr.send();
 
 // ****************************************************************** Marine Institute of Ireland data
 
@@ -1156,36 +1199,231 @@ xhr.onerror = function() {
 xhr.send();
 
 
-function storageAvailable(type) {
-    try {
-        var storage = window[type],
-            x = '__storage_test__';
-        storage.setItem(x, x);
-        storage.removeItem(x);
-        return true;
-    }
-    catch(e) {
-        return e instanceof DOMException && (
-            // everything except Firefox
-            e.code === 22 ||
-            // Firefox
-            e.code === 1014 ||
-            // test name field too, because code might not be present
-            // everything except Firefox
-            e.name === 'QuotaExceededError' ||
-            // Firefox
-            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
-            // acknowledge QuotaExceededError only if there's something already stored
-            storage.length !== 0;
-    }
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++ OPENWEATHER API
+
+openWeatherApiData = JSON.parse(localStorage.getItem('openWeatherApi'));
+
+console.log(openWeatherApiData.weather[0].main);
+
+
+var output = '';
+
+// Unix time to local time conversion
+
+        function unixToLocal(t) {
+            var dt = new Date(t*1000);
+            var hr = dt.getHours();
+            var m = '0' + dt.getMinutes();
+            return hr+ ':' +m.substr(-2); 
+        }
+
+        var sunrise = openWeatherApiData.sys.sunrise;
+        var sunset = openWeatherApiData.sys.sunset;
+
+        // console.log(unixToLocal(sunrise));
+        // console.log(unixToLocal(sunset));
+        // console.log(openWeather.weather[0].main);
+        // console.log(openWeather.main.temp);
+        // console.log(openWeather.wind.speed);
+        // console.log(openWeather.weather[0].description);
+
+        output += '<div>' +
+            '<ul>' +
+                '<li>Surf Spot: '+surfSpot.title+'</li>' +       
+                '<br>' +
+                '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
+                '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
+                '<br>' +
+                '<li>Weather: '+openWeatherApiData.weather[0].main+'</li>' +
+            '</ul>'
+
+            document.getElementById('data01').innerHTML = output;
+
+//++++++++++++++++++++++++++++++++++++++++++++++++ STORMGLASS API
+
+stormglassAPIData = JSON.parse(localStorage.getItem('stormglassAPI'));
+
+var weather = stormglassAPIData;
+
+// DATA MANIPULATION
+
+console.log(weather); // unspliced
+
+var weatherSpliced = (weather.hours).splice(24);
+
+// console.log(weather); // day data
+
+var afternoon = (weather.hours).splice(-9, 6);
+
+var midday = (weather.hours).splice(-7, 4);
+
+var morning = (weather.hours).splice(-9, 6);
+
+// console.log(morning);
+// console.log(midday);
+// console.log(afternoon);
+// console.log(morning[0].time); // 2018-12-18T05:00:00+00:00
+
+// Function that pass time arrays and spits out the average values for all of the weather parameters in form of a object:
+
+function timeOfDay(time) {
+    var totalWaveHeight = 0;
+    var totalWavePeriod = 0;
+    var totalWindDirection = 0;
+    var totalWindSpeed = 0;
+    var totalAirTemperature = 0;
+    var totalWaterTemperature = 0;
+
+    time.forEach(function(hour) {
+        totalWaveHeight += hour.waveHeight[0].value;
+        totalWavePeriod += hour.wavePeriod[0].value;
+        totalWindDirection += hour.windDirection[0].value;
+        totalWindSpeed += hour.windSpeed[0].value;
+        totalAirTemperature += hour.airTemperature[0].value;
+        totalWaterTemperature += hour.waterTemperature[0].value;
+        });
+
+    var average = new Object();
+    average['waveHeight'] = Math.round(totalWaveHeight / time.length);
+    average['wavePeriod'] = Math.round(totalWavePeriod / time.length);
+    average['windDirection'] = Math.round(totalWindDirection / time.length);
+    average['windSpeed'] = Math.round(totalWindSpeed / time.length);
+    average['airTemperature'] = Math.round(totalAirTemperature / time.length);
+    average['waterTemperature'] = Math.round(totalWaterTemperature / time.length);
+    return average;
 }
 
-if (storageAvailable('localStorage')) {
-    console.log('Yippee! We can use localStorage awesomeness');
-  } else {
-    console.log('Too bad, no localStorage for us');
-};
+var morningAverage = timeOfDay(morning);
+var middayAverage = timeOfDay(midday);
+var afternoonAverage = timeOfDay(afternoon);
 
-localData = JSON.parse(localStorage.getItem('openWeatherApi'));
+console.log(timeOfDay(midday));
+console.log(timeOfDay(morning));
+console.log(timeOfDay(afternoon));
 
-console.log(localData.weather[0].main);
+console.log(morningAverage.windDirection);
+
+// DATA
+
+        var output = '';
+
+// Data break down into types and values:
+
+        // var time = weather.hours[12].time;
+        // var airTemperature = Math.round(airTemperature);
+        // var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
+        // var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
+        // var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
+        // var swellDirection = (weather.hours[12].swellDirection[0].value).toFixed(1);
+        // var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
+        // var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
+
+        var timeNow = new Date();
+
+        var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
+        var monthAsString = monthNames[timeNow.getMonth()];
+
+        console.log('Todays date: ' + timeNow.getFullYear() + '.' + monthAsString + '.' + timeNow.getDate());
+
+// Display time for tidal & temperature information
+
+        var timeHour = ('0' + timeNow.getHours()).slice(-2);
+        var timeMinutes = timeNow.getMinutes();
+
+// Function that return degrees that fall withing range of word directions:
+
+        function direction(value) {
+            if (value >= 0 && value < 22.5 || value >=337.5) {
+                return 0;
+            } else if (value >= 22.5 && value < 67.5) {
+                return 45;
+            } else if (value >= 67.5 && value < 112.5) {
+                return 90;
+            } else if (value >= 112.5 && value < 157.5) {
+                return 135;
+            } else if (value >= 157.5 && value < 202.5) {
+                return 180;
+            } else if (value >= 202.5 && value < 247.5) {
+                    return 225;
+            } else if (value >= 247.5 && value <292.5) {
+                    return 270;
+            } else if (value >= 292.5 && value <337.5) {
+                    return 315;
+            }
+        };
+
+// Wind types that usues the wind direction and surf spots pointing direction to determin tyoe of wind for location
+
+        var wind = direction(morningAverage.windDirection);
+        var point = surfSpot.point;
+
+        console.log('Wind & Surf Spot wind directions: ' + wind + ' ' + point);
+
+        var range = [wind, point];
+
+        console.log('An Array of wind & point direction values: ' + range);
+        
+        function check() {
+            if ((wind - point) === 0) {
+              return 'Offshore';
+            } else if (
+              (range[0] === 0) && (range[1] === 180) ||
+              (range[0] === 180) && (range[1] === 0) ||
+              (range[0] === 90) && (range[1] === 270) ||
+              (range[0] === 270) && (range[1] === 90) ||
+              (range[0] === 45) && (range[1] === 225) ||
+              (range[0] === 225) && (range[1] === 45) ||
+              (range[0] === 135) && (range[1] === 315) ||
+              (range[0] === 315) && (range[1] === 135)) {
+              return 'Onshore';
+            } else {
+              return 'Crosswind';
+            }
+          }
+        
+        console.log('Type of wind result is: ' + check());
+
+// OUTPUT 1 - As per API requested time
+
+        // output += '<div>' +
+        //     '<ul>' +
+        //         '<li>Today is: '+timeNow+'</li>'+
+        //         '<li>Surf Spot: '+surfSpot.title+'</li>' +
+        //         '<br>' +
+        //         '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
+        //         '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
+        //         '<br>' +
+        //         '<li>Wave Height: '+waveHeight+' m</li>' +
+        //         '<li>Wave Period: '+wavePeriod+' seconds</li>' +
+        //         '<br>' +
+        //         '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
+        //         '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
+        //         '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
+        //         '<li>Wind Direction from: '+windDirection+'</li>' +
+        //         '<li>Wind: '+range+' '+check()+'</li>' +
+        //         '<br>' +
+        //         '<li>Wind Speed: '+windSpeed+' m/second</li>' +
+        //     '</ul>'
+
+output += '<div>' +
+    '<h1>Day Forecast</h1>' +
+    '<h2>Surf Spot: '+surfSpot.title+' on '+timeNow.getDate()+' '+monthAsString+'</h2>' +
+    '<br>' +
+    '<h2>Morning</h2>' +
+    '<p>Wave Height: '+morningAverage.waveHeight+' m | Wave Period: '+morningAverage.wavePeriod+' s</p>' +
+    '<p>Wind Type: '+morningAverage.waveHeight+' | Wind Speed: '+morningAverage.windSpeed+' m/s</p>' +
+    '<p>Air Temperature: '+morningAverage.airTemperature+' &#8451 | Water Temperature: '+morningAverage.waterTemperature+' &#8451</p>' +
+    '<h2>Midday</h2>' +
+    '<p>Wave Height: '+middayAverage.waveHeight+' m | Wave Period: '+middayAverage.wavePeriod+' s</p>' +
+    '<p>Wind Type: '+middayAverage.waveHeight+' | Wind Speed: '+middayAverage.windSpeed+' m/s</p>' +
+    '<p>Air Temperature: '+middayAverage.airTemperature+' &#8451 | Water Temperature: '+middayAverage.waterTemperature+' &#8451</p>' +
+    '<h2>Afternoon</h2>' +
+    '<p>Wave Height: '+afternoonAverage.waveHeight+' m | Wave Period: '+afternoonAverage.wavePeriod+' s</p>' +
+    '<p>Wind Type: '+afternoonAverage.waveHeight+' | Wind Speed: '+afternoonAverage.windSpeed+' m/s</p>' +
+    '<p>Air Temperature: '+afternoonAverage.airTemperature+' &#8451 | Water Temperature: '+afternoonAverage.waterTemperature+' &#8451</p>'
+
+    document.getElementById('data02').innerHTML = output;
