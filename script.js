@@ -171,7 +171,7 @@ var surfSpot = surfSpots[19];
 
 // console.log(surfSpots[19]);
 
-// ****************************************************************** OpenWeatherMap API
+// ****************************************************************** OpenWeatherMap API CURRENT FORECAST
 
 var apiOpenWeather = '74ecf887ea2ee80ab6586f67dfe5ee24';
 
@@ -191,40 +191,34 @@ xhr.onreadystatechange = function() {
 
         localStorage.setItem('openWeatherApi', JSON.stringify(openWeather));
 
-// BELOW MOVED OUTSIDE XHR REQUEST AS STORED LOCALLY:
+    } else if (this.readyState == 4 && this.status == 402) {
+        document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
+    }  
+};
 
-//         var output = '';
+xhr.onerror = function() {
+    console.log('Request error');
+};
 
-// // Unix time to local time conversion
+xhr.send();
 
-//         function unixToLocal(t) {
-//             var dt = new Date(t*1000);
-//             var hr = dt.getHours();
-//             var m = '0' + dt.getMinutes();
-//             return hr+ ':' +m.substr(-2); 
-//         }
+// ****************************************************************** OpenWeatherMap API EXTENDED FORECAST
 
-//         var sunrise = openWeather.sys.sunrise;
-//         var sunset = openWeather.sys.sunset;
+var xhr = new XMLHttpRequest();
 
-//         // console.log(unixToLocal(sunrise));
-//         // console.log(unixToLocal(sunset));
-//         // console.log(openWeather.weather[0].main);
-//         // console.log(openWeather.main.temp);
-//         // console.log(openWeather.wind.speed);
-//         // console.log(openWeather.weather[0].description);
+xhr.open('GET', `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&units=metric&APPID=${apiOpenWeather}`, true);
 
-//         output += '<div>' +
-//             '<ul>' +
-//                 '<li>Surf Spot: '+surfSpot.title+'</li>' +       
-//                 '<br>' +
-//                 '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
-//                 '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
-//                 '<br>' +
-//                 '<li>Weather: '+openWeather.weather[0].main+'</li>' +
-//             '</ul>'
+xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var openWeatherEx = JSON.parse(this.responseText);
+        // console.log(openWeatherEx);
 
-//             document.getElementById('data01').innerHTML = output;
+// Storing data locally
+
+        var openWeatherExApi = openWeatherEx;
+        var openWeatherExApiData;
+
+        localStorage.setItem('openWeatherExApi', JSON.stringify(openWeatherEx));
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -878,12 +872,39 @@ xhr.onerror = function() {
     console.log('Request error: ');
 };
 
-// xhr.send();
+xhr.send();
 
 // ****************************************************************** Marine Institute of Ireland data
 
-var timeFrom = '2018-12-15T00%3A00%3A00Z';
-var timeTo = '2018-12-16T00%3A00%3A00Z';
+var timeToday = new Date();
+var timeTodayFormat = timeToday.getFullYear() + '-' + timeToday.getMonth() + '-' + timeToday.getDate();
+
+var timeTomorrow = timeToday.setDate(timeToday.getDate() +1);
+
+// Unix time to local time conversion
+
+function timeConverter(t) {
+    var tmr = new Date(t);
+    var year = tmr.getFullYear();
+    var month = tmr.getMonth();
+    var day = tmr.getDate();
+    var time = year + '-' + month + '-' + day;
+    return time; 
+}
+
+// console.log(timeConverter(timeTomorrow));
+
+// var monthsNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+// 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// var monthAsString = monthsNamesShort[timeToday.getMonth()];
+
+// console.log(timeToday.getFullYear() + '-' + timeToday.getMonth() + '-' + timeToday.getDate());
+
+var timeFrom = timeTodayFormat + 'T00%3A00%3A00Z';
+console.log(timeFrom);
+var timeTo = timeConverter(timeTomorrow) + 'T00%3A00%3A00Z';
+console.log(timeTo);
 var stationId = '%22Dublin_Port%22';
 
 var xhr = new XMLHttpRequest();
@@ -1205,10 +1226,7 @@ xhr.send();
 
 openWeatherApiData = JSON.parse(localStorage.getItem('openWeatherApi'));
 
-console.log(openWeatherApiData.weather[0].main);
-
-
-var output = '';
+console.log(openWeatherApiData);
 
 // Unix time to local time conversion
 
@@ -1219,27 +1237,29 @@ var output = '';
             return hr+ ':' +m.substr(-2); 
         }
 
+        console.log(new Date());
+
+console.log(unixToLocal(openWeatherApiData.dt)); // current weather forecast NOW
+
         var sunrise = openWeatherApiData.sys.sunrise;
         var sunset = openWeatherApiData.sys.sunset;
 
-        // console.log(unixToLocal(sunrise));
-        // console.log(unixToLocal(sunset));
-        // console.log(openWeather.weather[0].main);
-        // console.log(openWeather.main.temp);
-        // console.log(openWeather.wind.speed);
-        // console.log(openWeather.weather[0].description);
+//++++++++++++++++++++++++++++++++++++++++++++++++ OPENWEATHER API EXTENDED
 
-        output += '<div>' +
-            '<ul>' +
-                '<li>Surf Spot: '+surfSpot.title+'</li>' +       
-                '<br>' +
-                '<li>Sunrise: '+unixToLocal(sunrise)+'</li>'+
-                '<li>Sunset: '+unixToLocal(sunset)+'</li>' +
-                '<br>' +
-                '<li>Weather: '+openWeatherApiData.weather[0].main+'</li>' +
-            '</ul>'
+openWeatherExApiData = JSON.parse(localStorage.getItem('openWeatherExApi'));
 
-            document.getElementById('data01').innerHTML = output;
+console.log(openWeatherExApiData);
+
+console.log(openWeatherExApiData.list);
+// console.log(unixToLocal(openWeatherExApiData.list[0].dt) + ' on ' + openWeatherExApiData.list[0].dt_txt); 
+console.log(openWeatherExApiData.list[0].weather[0].description + ' ' +
+openWeatherExApiData.list[3].weather[0].description + ' ' +
+openWeatherExApiData.list[6].weather[0].description + ' ' +
+openWeatherExApiData.list[9].weather[0].description + ' ' +
+openWeatherExApiData.list[12].weather[0].description + ' ' +
+openWeatherExApiData.list[15].weather[0].description + ' ' +
+openWeatherExApiData.list[18].weather[0].description + ' ' +
+openWeatherExApiData.list[21].weather[0].description);
 
 //++++++++++++++++++++++++++++++++++++++++++++++++ STORMGLASS API
 
@@ -1249,7 +1269,8 @@ var weather = stormglassAPIData;
 
 // DATA MANIPULATION
 
-console.log(weather); // unspliced
+        // DAY FORECAST
+// console.log(weather); // unspliced
 
 var weatherSpliced = (weather.hours).splice(24);
 
@@ -1265,6 +1286,18 @@ var morning = (weather.hours).splice(-9, 6);
 // console.log(midday);
 // console.log(afternoon);
 // console.log(morning[0].time); // 2018-12-18T05:00:00+00:00
+
+        // THREE DAYS FORECAST
+
+var weatherSplicedThree = weatherSpliced.splice(72);
+
+var dayThree = weatherSpliced.splice(-24, 24);
+var dayTwo =  weatherSpliced.splice(-24, 24);
+var dayOne = weatherSpliced;
+
+// console.log(dayOne);
+// console.log(dayTwo);
+// console.log(dayThree);
 
 // Function that pass time arrays and spits out the average values for all of the weather parameters in form of a object:
 
@@ -1303,22 +1336,17 @@ console.log(timeOfDay(midday));
 console.log(timeOfDay(morning));
 console.log(timeOfDay(afternoon));
 
+console.log(timeOfDay(dayOne));
+console.log(timeOfDay(dayTwo));
+console.log(timeOfDay(dayThree));
+
 console.log(morningAverage.windDirection);
 
 // DATA
 
-        var output = '';
+        // var output = '';  // output taken for the day
 
 // Data break down into types and values:
-
-        // var time = weather.hours[12].time;
-        // var airTemperature = Math.round(airTemperature);
-        // var waterTemperature = Math.round(weather.hours[12].waterTemperature[0].value);
-        // var waveHeight = (weather.hours[12].waveHeight[0].value).toFixed(1);
-        // var wavePeriod = Math.round(weather.hours[12].wavePeriod[0].value);
-        // var swellDirection = (weather.hours[12].swellDirection[0].value).toFixed(1);
-        // var windDirection = (weather.hours[12].windDirection[0].value).toFixed(1);
-        // var windSpeed = Math.round(weather.hours[12].windSpeed[0].value);
 
         var timeNow = new Date();
 
@@ -1394,31 +1422,22 @@ console.log(morningAverage.windDirection);
         console.log('Type of wind result is: ' + windType(middayAverage.windDirection));
         console.log('Type of wind result is: ' + windType(afternoonAverage.windDirection));
 
+// DATA OUTPUTS TO HTML
+
+var outputNow = '';
+var outputDay = '';
+var outputThreeDays = '';
+
 // OUTPUT 1 - As per API requested time
 
-        // output += '<div>' +
-        //     '<ul>' +
-        //         '<li>Today is: '+timeNow+'</li>'+
-        //         '<li>Surf Spot: '+surfSpot.title+'</li>' +
-        //         '<br>' +
-        //         '<li>Air Temperature: '+airTemperature+' &#8451</li>' +
-        //         '<li>Water Temperature: '+waterTemperature+' &#8451</li>' +
-        //         '<br>' +
-        //         '<li>Wave Height: '+waveHeight+' m</li>' +
-        //         '<li>Wave Period: '+wavePeriod+' seconds</li>' +
-        //         '<br>' +
-        //         '<li>Surf Spot pointing: '+surfSpot.point+'</li>' +
-        //         '<li>Swell Direction from: '+direction(swellDirection)+'</li>' +
-        //         '<li>Wind Direction from: '+direction(windDirection)+'</li>' +
-        //         '<li>Wind Direction from: '+windDirection+'</li>' +
-        //         '<li>Wind: '+range+' '+check()+'</li>' +
-        //         '<br>' +
-        //         '<li>Wind Speed: '+windSpeed+' m/second</li>' +
-        //     '</ul>'
-
-output += '<div>' +
+outputDay += '<div>' +
     '<h1>Day Forecast</h1>' +
     '<h2>Surf Spot: '+surfSpot.title+' on '+timeNow.getDate()+' '+monthAsString+'</h2>' +
+    '<br>' +
+    '<h3>Sunrise: '+unixToLocal(sunrise)+'</h3>'+
+    '<h3>Sunset: '+unixToLocal(sunset)+'</h3>' +
+    '<br>' +
+    '<h3>Weather: '+openWeatherApiData.weather[0].main+' or '+openWeatherApiData.weather[0].description+'</h3>' +
     '<br>' +
     '<h2>Morning</h2>' +
     '<p>Wave Height: '+morningAverage.waveHeight+' m | Wave Period: '+morningAverage.wavePeriod+' s</p>' +
@@ -1433,4 +1452,22 @@ output += '<div>' +
     '<p>Wind Type: '+windType(afternoonAverage.windDirection)+' | Wind Speed: '+afternoonAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+afternoonAverage.airTemperature+' &#8451 | Water Temperature: '+afternoonAverage.waterTemperature+' &#8451</p>'
 
-    document.getElementById('data02').innerHTML = output;
+
+outputThreeDays += '<div>' +
+    '<h1>3 Days Forecast</h1>' +
+    '<h2>Surf Spot: '+surfSpot.title+' on '+timeNow.getDate()+' '+monthAsString+'</h2>' +
+    '<br>' +
+    '<h3>Sunrise: '+unixToLocal(sunrise)+'</h3>'+
+    '<h3>Sunset: '+unixToLocal(sunset)+'</h3>' +
+    '<br>' +
+    '<h3>Weather: '+openWeatherApiData.weather[0].description+'</h3>' +
+    '<br>' + 
+    '<h2>Morning</h2>' +
+    '<p>Wave Height: '+morningAverage.waveHeight+' m | Wave Period: '+morningAverage.wavePeriod+' s</p>' +
+    '<p>Wind Type: '+windType(morningAverage.windDirection)+' | Wind Speed: '+morningAverage.windSpeed+' m/s</p>' +
+    '<p>Air Temperature: '+morningAverage.airTemperature+' &#8451 | Water Temperature: '+morningAverage.waterTemperature+' &#8451</p>'
+    
+
+    document.getElementById('data01').innerHTML = outputDay;
+    document.getElementById('data02').innerHTML = outputThreeDays;
+
