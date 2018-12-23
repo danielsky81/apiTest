@@ -1,5 +1,5 @@
 body {
-    background-color: #0E7FA6;
+    background-color: #3E4EA4;
 }
 
 /* img {
@@ -15,6 +15,9 @@ div .col-xs-12 {
     width: 90vw;
     margin: 10vh 5vw;
     border-radius: 10px;
+    -webkit-box-shadow: 10px 20px 15px -5px rgba(0,0,0,0.25);
+    -moz-box-shadow: 10px 20px 15px -5px rgba(0,0,0,0.25);
+    box-shadow: 10px 20px 15px -5px rgba(0,0,0,0.25);
 }
 
 div .col-xs-4 {
@@ -31,11 +34,11 @@ div .col-xs-4 {
 }
 
 .forecast {
-    color: white;
+    color: #E1F7E6;
 }
 
 .bar {
-    fill: white;
+    color: #E1F7E6;
     radius: 5px;
 }
 
