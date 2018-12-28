@@ -1,3 +1,7 @@
+window.addEventListener("load", function(event) {
+    console.log("All resources finished loading!");
+  });
+
 // Local Storage Checks
 
 function storageAvailable(type) {
@@ -24,10 +28,10 @@ function storageAvailable(type) {
     }
 }
 
-if (storageAvailable('localStorage')) {
-    console.log('Yippee! We can use localStorage awesomeness');
+if (storageAvailable('sessionStorage')) {
+    console.log('Yippee! We can use sessionStorage awesomeness');
   } else {
-    console.log('Too bad, no localStorage for us');
+    console.log('Too bad, no sessionStorage for us');
 };
 
 // Surf Spots definition
@@ -64,7 +68,7 @@ function initMap() {
             featureType: 'landscape',
             elementType: 'all',
             stylers: [
-                { color: '#11487D' }
+                { color: '#3E4EA4' }
             ]
         },
         {
@@ -78,7 +82,7 @@ function initMap() {
             featureType: 'administrative',
             elementType: 'labels.text.fill',
             stylers: [
-                { color: '#70D6BC' }
+                { color: '#ffffff' }
             ]
         },
         {
@@ -92,7 +96,8 @@ function initMap() {
             featureType: 'road',
             elementType: 'geometry',
             stylers: [
-                { color: '#38C7BD' }
+                // { color: '#02BEC4' }
+                { visibility: 'off' }
             ]
         },
         {
@@ -106,7 +111,7 @@ function initMap() {
             featureType: 'water',
             elementType: 'all',
             stylers: [
-                { color: '#0E7FA6' }
+                { color: '#FD6591' }
             ]
         }
     ]
@@ -135,7 +140,7 @@ function initMap() {
             animation: google.maps.Animation.DROP,
             id: i,
             icon: {
-                url: 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png'
+                url: 'assets/Marker_custom.png'
               }
         });
         // Push marker to our array of markers
@@ -189,7 +194,7 @@ xhr.onreadystatechange = function() {
         var openWeatherApi = openWeather;
         var openWeatherApiData;
 
-        localStorage.setItem('openWeatherApi', JSON.stringify(openWeather));
+        sessionStorage.setItem('openWeatherApi', JSON.stringify(openWeather));
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -218,7 +223,7 @@ xhr.onreadystatechange = function() {
         var openWeatherExApi = openWeatherEx;
         var openWeatherExApiData;
 
-        localStorage.setItem('openWeatherExApi', JSON.stringify(openWeatherEx));
+        sessionStorage.setItem('openWeatherExApi', JSON.stringify(openWeatherEx));
 
     } else if (this.readyState == 4 && this.status == 402) {
         document.getElementById('data01').innerHTML = 'Data request exceeded! Please come back tomorrow';
@@ -251,7 +256,7 @@ xhr.onreadystatechange = function() {
 var stormglassAPI = weatherAPI;
 var stormglassAPIData;
 
-localStorage.setItem('stormglassAPI', JSON.stringify(weatherAPI));
+sessionStorage.setItem('stormglassAPI', JSON.stringify(weatherAPI));
 
 // MOVE OUTSIDE OF XHR REQUEST
 
@@ -872,7 +877,7 @@ xhr.onerror = function() {
     console.log('Request error: ');
 };
 
-// xhr.send(); // MAKE SURE TO SEND REQUEST ONLY ONCE PER DAY
+xhr.send(); // MAKE SURE TO SEND REQUEST ONLY ONCE PER DAY
 
 // ****************************************************************** Marine Institute of Ireland data
 
@@ -970,7 +975,8 @@ xhr.onreadystatechange = function() {
 
         // console.log(timeHM);
        
-        // console.log(tidesValue);
+        // console.log(typeof(tidesValue));
+        // console.log(Math.max(tidesValue));
 
         // the tidesValue index reflect the time as well since the first element (i.e index 0) equal the midnight 00:00
 
@@ -987,7 +993,7 @@ xhr.onreadystatechange = function() {
                 });
         };
 
-        // console.log(dataApi);
+        console.log(dataApi);
 
 
 // LINE CHART
@@ -1235,7 +1241,7 @@ xhr.send();
 
 //++++++++++++++++++++++++++++++++++++++++++++++++ OPENWEATHER API
 
-openWeatherApiData = JSON.parse(localStorage.getItem('openWeatherApi'));
+openWeatherApiData = JSON.parse(sessionStorage.getItem('openWeatherApi'));
 
 console.log(openWeatherApiData);
 
@@ -1257,7 +1263,7 @@ console.log(openWeatherApiData);
 
 //++++++++++++++++++++++++++++++++++++++++++++++++ OPENWEATHER API EXTENDED
 
-openWeatherExApiData = JSON.parse(localStorage.getItem('openWeatherExApi'));
+openWeatherExApiData = JSON.parse(sessionStorage.getItem('openWeatherExApi'));
 
 console.log(openWeatherExApiData);
 
@@ -1274,7 +1280,7 @@ function weatherDesc(time) {
 
 //++++++++++++++++++++++++++++++++++++++++++++++++ STORMGLASS API
 
-stormglassAPIData = JSON.parse(localStorage.getItem('stormglassAPI'));
+stormglassAPIData = JSON.parse(sessionStorage.getItem('stormglassAPI'));
 
 var weather = stormglassAPIData;
 
@@ -1448,6 +1454,7 @@ var outputNow = '';
 var outputDay = '';
 var outputThreeDays = '';
 
+console.log(openWeatherApiData.dt);
 // OUTPUT 1 - As per API requested time
 
 outputDay += '<div>' +
@@ -1457,7 +1464,7 @@ outputDay += '<div>' +
     '<h3>Sunrise: '+unixToLocal(sunrise)+'</h3>'+
     '<h3>Sunset: '+unixToLocal(sunset)+'</h3>' +
     '<br>' +
-    '<h3>Weather: '+openWeatherApiData.weather[0].description+'</h3>' +
+    '<h3>Weather: '+unixToLocal(openWeatherApiData.dt)+' '+openWeatherApiData.weather[0].description+'</h3>' +
     '<br>' +
     '<h2>Morning</h2>' +
     '<p>Wave Height: '+morningAverage.waveHeight+' m | Wave Period: '+morningAverage.wavePeriod+' s</p>' +
@@ -1484,19 +1491,19 @@ outputThreeDays += '<div>' +
     '<p>Wave Height: '+dayOneAverage.waveHeight+' m | Wave Period: '+dayOneAverage.wavePeriod+' s</p>' +
     '<p>Wind Type: '+windType(dayOneAverage.windDirection)+' | Wind Speed: '+dayOneAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+dayOneAverage.airTemperature+' &#8451 | Water Temperature: '+dayOneAverage.waterTemperature+' &#8451</p>' +
-    '<p>Weather: '+weatherDesc(5)+'</p>' +
+    '<p>Weather: '+openWeatherExApiData.list[5].dt_txt+' '+weatherDesc(5)+'</p>' +
     '<br>' + 
     '<h2>Day after Tomorrow</h2>' +
     '<p>Wave Height: '+dayTwoAverage.waveHeight+' m | Wave Period: '+dayTwoAverage.wavePeriod+' s</p>' +
     '<p>Wind Type: '+windType(dayTwoAverage.windDirection)+' | Wind Speed: '+dayTwoAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+dayTwoAverage.airTemperature+' &#8451 | Water Temperature: '+dayTwoAverage.waterTemperature+' &#8451</p>' +
-    '<p>Weather: '+weatherDesc(13)+'</p>' +
+    '<p>Weather: '+openWeatherExApiData.list[13].dt_txt+' '+weatherDesc(13)+'</p>' +
     '<br>' + 
     '<h2>2 Days after Tomorrow</h2>' +
     '<p>Wave Height: '+dayThreeAverage.waveHeight+' m | Wave Period: '+dayThreeAverage.wavePeriod+' s</p>' +
     '<p>Wind Type: '+windType(dayThreeAverage.windDirection)+' | Wind Speed: '+dayThreeAverage.windSpeed+' m/s</p>' +
     '<p>Air Temperature: '+dayThreeAverage.airTemperature+' &#8451 | Water Temperature: '+dayThreeAverage.waterTemperature+' &#8451</p>' +
-    '<p>Weather: '+weatherDesc(21)+'</p>'
+    '<p>Weather: '+openWeatherExApiData.list[21].dt_txt+' '+weatherDesc(21)+'</p>'
 
     document.getElementById('data01').innerHTML = outputNow;
     document.getElementById('data02').innerHTML = outputDay;
